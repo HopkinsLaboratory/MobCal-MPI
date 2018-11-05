@@ -1,6 +1,5 @@
-# HopCal-MPI
-Parallelization of the commonly used MobCal suite to calculate ion mobilities and collision cross sections
-From the Read_Me.txt: 
+# MobCal-MPI
+Parallelization of the commonly used MobCal suite to calculate ion mobilities and collision cross sections. From the Read_Me.txt: 
 
 --------------------------------------------------- INTRODUCTION ---------------------------------------------------
 
