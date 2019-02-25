@@ -1,6 +1,6 @@
 C     PROGRAM MOBCAL_MPI
 C
-C     Mobility Calculation program published in ...
+C     Mobility Calculation program published in Analyst (2019) 144, 1660-1670
 C**************************************************************************
 C**************************************************************************
 C     Adapted from original code with reference:
