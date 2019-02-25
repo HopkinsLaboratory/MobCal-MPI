@@ -1,9 +1,10 @@
-C     PROGRAM MOBCAL_MPI
+C     PROGRAM MobCal-MPI
 C
 C     Mobility Calculation program published in Analyst (2019) 144, 1660-1670
 C**************************************************************************
 C**************************************************************************
-C     Adapted from original code with reference:
+C     Adapted from original code with reference Analyst (2018) 143, 1786-1796
+C     
 c     PROGRAM MOBCAL
 c
 c     Program to Calculate Mobilities
@@ -86,9 +87,6 @@ c
 c     ***************************************************************
 C******************************************************************************
 C******************************************************************************
-C     Major changes include inclusion of "softer" exp-6 Lennard-Jones
-C     potential and more exhaustive paramater set which needs to be
-C     included as input
 c
 c
       implicit double precision (a-h,m-z)
