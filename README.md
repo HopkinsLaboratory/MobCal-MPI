@@ -6,7 +6,7 @@ Parallelization of the commonly used MobCal suite to calculate ion mobilities an
 This Python3 script is used to convert Gaussian .log outputs to MobCal .mfj inputs with MMFF94 atom labels and parameters. 
 Steps 1 and 2 only need to be done the first time the script is used.
 
-A PowerPoint file is included with this release that covers the fundamentals of the trajectory method, optimizations outlined in *****REF*****, and file formats/ conversions used in the creation of MobCal inputs (.mjf).
+A PowerPoint file is included with this release that covers the fundamentals of the trajectory method, optimizations outlined in Analyst (2019), 144, 1660-1670, and file formats/ conversions used in the creation of MobCal inputs (.mjf).
 While it is not necessary to read this, it is strongly recommended to understand what you are calculating, how the mfj_creator.py script works, and more importantly, how MobCal_MPI works.
 
 
@@ -37,7 +37,7 @@ We recommend  that molecular structures input in to MobCal-MPI are optimized at 
 Partial charges are REQUIRED. For the highest accuracy, partial charges should be calculated using the ChelpG or MK partition scheme, and constrained to reproduce the molecular dipole moment. Utilization of Mulliken charges is associated with large errors in CCS calculation accuracy.
 We recommend the pop=(mk,dipole) keyword if using Gaussian09/Gaussian16. 
 
-For relevant discussion on the choice of partial charges, see ***************MANUSCRIPT IN PREPARATION*********************
+For relevant discussion on the choice of partial charges, see Analyst (2019), 144, 1660-1670
 An example input line for G09/G16 should look like: 
 
 # opt freq b3lyp/6-31++g(d,p) int=ultrafine scf=xqc empiricaldispersion=GD3 pop=(mk,dipole)
