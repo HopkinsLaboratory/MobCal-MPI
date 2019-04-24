@@ -187,6 +187,8 @@ To compile MobCal-MPI:
 2. Compile using the following command (or using an alternative legacy Fortran compiler): 
 mpif90 -o MobCal_MPI.exe MobCal_MPI.f -Ofast 
 
+**note that some legacy compilers do not properly implement optimization flags (ie. the use of -Ofast). To verify functionality, please run MobCal-MPI on the test files provided and ensure that CCS values calculated at each cycle match the outputs (within reasonable error). If they do not, it is likely a compiler issue. This can be resolved by using less stringent (ie -O or -O2) or no optimization flags.
+
 3. A bash script for SLURM schedulers has been provided (runmob_MPI.sh). To use this:
 
 Place script in the same directory containing your .mjf files and compiled MobCal_MPI (will be a .exe extension after compilation)
