@@ -6,7 +6,7 @@ Parallelization of the commonly used MobCal suite to calculate ion mobilities an
 This Python3 script is used to convert Gaussian .log outputs to MobCal .mfj inputs with MMFF94 atom labels and parameters. 
 Steps 1 and 2 only need to be done the first time the script is used.
 
-A PowerPoint file is included with this release that covers the fundamentals of the trajectory method, optimizations outlined in *****REF*****, and file formats/ conversions used in the creation of MobCal inputs (.mjf).
+A PowerPoint file is included with this release that covers the fundamentals of the trajectory method, optimizations outlined in Analyst, 2019, 144, 1660-1670, and file formats/ conversions used in the creation of MobCal inputs (.mjf).
 While it is not necessary to read this, it is strongly recommended to understand what you are calculating, how the mfj_creator.py script works, and more importantly, how MobCal_MPI works.
 
 ------------------------------------------------------ UPDATES ------------------------------------------------------
