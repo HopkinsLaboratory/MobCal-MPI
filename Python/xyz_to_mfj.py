@@ -1,4 +1,5 @@
 import os
+import random
 
 def xyz_to_mfj(directory,xyz,key,mfj,charge,parameters):
 	#Get the filename
@@ -48,9 +49,11 @@ def xyz_to_mfj(directory,xyz,key,mfj,charge,parameters):
 		vdw_info[(parsed)[0]] = [parsed[1],parsed[2],parsed[3],parsed[4]]
 
 	opf = open(mfj,"w")
-	spacing = '%s\n%s\n%s\n%s\n%s\n%s\n%s %s %s %s\n' #regex for header
+	seed = random.randint(1000000,1000000000)
+	seed = -(seed)
+	spacing = '%s\n%s\n%s\n%s\n%s\n%s\n%s %s %s %s %s\n' #regex for header
 	#We want to write the filename, 1, number of atoms, ang, calc, and 1 to the header
-	opf.write(spacing%(filename,'1',str(atom_num),'ang',charge,'1.0000',parameters[0],parameters[1],parameters[2],parameters[3]))
+	opf.write(spacing%(filename,'1',str(atom_num),'ang',charge,'1.0000',parameters[0],parameters[1],parameters[2],parameters[3],seed))
 	for i in range(atom_num):
 		spacing = '%10s	   %10s	   %10s	   %7s	  %10s	  %5s	 %5s	%5s	   %5s\n' #regex for line
 		try: #Get the mass for the atom
