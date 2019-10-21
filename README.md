@@ -6,9 +6,20 @@ Parallelization of the commonly used MobCal suite to calculate ion mobilities an
 This Python3 script is used to convert Gaussian .log outputs to MobCal .mfj inputs with MMFF94 atom labels and parameters. 
 Steps 1 and 2 only need to be done the first time the script is used.
 
-A PowerPoint file is included with this release that covers the fundamentals of the trajectory method, optimizations outlined in Analyst (2019), 144, 1660-1670, and file formats/ conversions used in the creation of MobCal inputs (.mjf).
+A PowerPoint file is included with this release that covers the fundamentals of the trajectory method, optimizations outlined in *****REF*****, and file formats/ conversions used in the creation of MobCal inputs (.mjf).
 While it is not necessary to read this, it is strongly recommended to understand what you are calculating, how the mfj_creator.py script works, and more importantly, how MobCal_MPI works.
 
+------------------------------------------------------ UPDATES ------------------------------------------------------
+
+Version 1.2: 
+Fixed an issue with the calculation of mobility (K), which assumed a number gas density at 273 K. The number gas density is now calculated at the specified temperature at p = 1 atm. 
+The input .mfj file has been modified to include an explicit random seed number for each file rather than MobCal-MPI manually assigning one. 
+(beta) A python package has been provided to Boltzmann-weight the CCSs for a particular species (Energy_weighter.py)
+
+Energy_weighter.py
+To use this code, you will need to create a .csv containing 2 columns. The first should be your filename. The second should be your Gibbs corrected energy of the isomer (as predicted by whichever computational package you use). The units for this are irrelevant since we take relative values, so leaving this in hartree is fine. See test.csv as an example. 
+On line 6 of the code, specify the directly which contains the .csv. On line 13, specify the name of the .csv I alluded to in the above paragraph. I’ve attached working examples to this email. The output of the code contains the relative Boltzmann weights as a .csv. Using the CCS extractor included with MobCal-MPI, you can simply paste the results into Excel, multiply and take the sum to obtain your Boltzmann-weighted CCS. (see Rel_E.csv for example output).
+The Energy_weighter.py script detects identical molecules by the name, and parses by the underscore. If you were to use this, it assumes your files names are eg. Molecule1_1.log, Molecule1_2.log; Molecule2_1.log, Molecule2_2.log ...and so on. The code will recognize and split molecule 1 from 2, and calculate the Boltzmann weight for the 2 conformations of each independent of other molecules.
 
 ------------------------------------------- INSTALLING RELEVANT PACKAGES -------------------------------------------
 
@@ -37,7 +48,7 @@ We recommend  that molecular structures input in to MobCal-MPI are optimized at 
 Partial charges are REQUIRED. For the highest accuracy, partial charges should be calculated using the ChelpG or MK partition scheme, and constrained to reproduce the molecular dipole moment. Utilization of Mulliken charges is associated with large errors in CCS calculation accuracy.
 We recommend the pop=(mk,dipole) keyword if using Gaussian09/Gaussian16. 
 
-For relevant discussion on the choice of partial charges, see Analyst (2019), 144, 1660-1670
+For relevant discussion on the choice of partial charges, see ***************MANUSCRIPT IN PREPARATION*********************
 An example input line for G09/G16 should look like: 
 
 # opt freq b3lyp/6-31++g(d,p) int=ultrafine scf=xqc empiricaldispersion=GD3 pop=(mk,dipole)
@@ -135,7 +146,7 @@ Number of atoms
 Units for xyz coordinates (ang for angstroms, au for atomic units)
 Charge scheme (calc for non-uniform, custom charges; equal for equal charges (i.e., 1 / N(atoms)); none for no partial charges)
 Scaling factor for xyz coordinates (typically always 1.0000)
-itn inp imp gas# (1 for He, 2 for N2)
+itn inp imp gas# (1 for He, 2 for N2) seed#
 x	y	z	mass	partial charge	alpha_i	Ai	Ni	Gi
 
 Example:
@@ -205,7 +216,8 @@ Use this for submission on all SLURM schedulers.
 
 Questions? Comments? Concerns? Email us! 
 
-cieritano@uwaterloo.ca
+cieritan@edu.uwaterloo.ca
 shopkins@uwaterloo.ca
+
 
 
