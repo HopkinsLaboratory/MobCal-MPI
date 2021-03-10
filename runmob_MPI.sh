@@ -19,11 +19,11 @@
   echo "#!/bin/bash" > $runfile
   echo "#SBATCH --account=rrg-shopkins-ab" >> $runfile
   echo "#SBATCH --nodes=1" >> $runfile
-  echo "#SBATCH --ntasks-per-node=16" >> $runfile
-  echo "#SBATCH --mem=16000M" >> $runfile
-  echo "#SBATCH --time=0-01:00" >> $runfile
+  echo "#SBATCH --ntasks-per-node=8" >> $runfile
+  echo "#SBATCH --mem=8000M" >> $runfile
+  echo "#SBATCH --time=0-03:00" >> $runfile
   echo " srun MobCal_MPI.exe $mobinp" >> $runfile
   sbatch $runfile
-  sleep 2s
+  sleep 0.5s
   cnt=$(($cnt+$one))
  done < "$input"

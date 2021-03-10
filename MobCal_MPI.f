@@ -41,6 +41,9 @@ c     Modified to allow uniform and non-uniform charge distributions
 c     Version of 08/23/97
 c     Modified to allow calculations with a non-uniform charge distribution
 c     Version of 21/10/19
+C
+C     Version 17/01/21
+C     Adding multiple temp runs in same input file
 C***  Explicit seed and correction to calculation of ion mobility (K); does not affect previous CCS calculations
 c
 c     MOBIL2 calculates the mobility using a Lennard-Jones plus
@@ -97,21 +100,21 @@ c
       dimension tmc(100),
      ?asympp(100)
       character*50 filen1,filen2,unit,dchar,xlabel,infile
-      parameter (len=1000)
+      parameter (ixlen=1000)
       character*2 flend(32)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
-      common/charge/pcharge(len),k_const(len)
-      common/coordinates/fx(len),fy(len),fz(len),
-     ?ox(len),oy(len),oz(len)
-      common/ljparameters/eolj(len),rolj(len),eox4(len),
-     ?ro6lj(len),ro12lj(len),dro6(len),dro12(len)
-      common/ljparameters2/alphai(len),Ni(len),Ai(len),Gi(len),
-     1 RijStar(len),eij(len)
+      common/charge/pcharge(ixlen),k_const(ixlen)
+      common/coordinates/fx(ixlen),fy(ixlen),fz(ixlen),
+     ?ox(ixlen),oy(ixlen),oz(ixlen)
+      common/ljparameters/eolj(ixlen),rolj(ixlen),eox4(ixlen),
+     ?ro6lj(ixlen),ro12lj(ixlen),dro6(ixlen),dro12(ixlen)
+      common/ljparameters2/alphai(ixlen),Ni(ixlen),Ai(ixlen),Gi(ixlen),
+     1 RijStar(ixlen),eij(ixlen)
       common/mmffN2/alphaN2,NiN2,AiN2,GiN2,RN2Star,MMFF_B,MMFF_beta
       common/mmffHe/alphaHe,NiHe,AiHe,GiHe,RHeStar
-      common/hsparameters/rhs(len),rhs2(len)
+      common/hsparameters/rhs(ixlen),rhs2(ixlen)
       common/trajectory/sw1,sw2,dtsf1,dtsf2,cmin,ifail,ifailc,inwr
       common/angles/theta,phi,gamma
       common/xrandom/i1,i2,i3,i4,i5,i6
@@ -120,7 +123,10 @@ C****NEED COMMON BLOCK FOR MPI ELEMENTS
       common/mobilcal/b2max(100),parab2max(100),temp1,temp2
       common/mpicon/imyrank,inprocs,imp_per_node,inp_per_node,s_time
       common/runparams/itn,inp,imp,igas
-C****
+C****Add ability for tarray.. up to max of 50 temps
+      dimension tarray(50)
+      dimension tmmarray(50),csarray(50),sdevarray(50)
+C******
       data flend/'_1','_2','_3','_4','_5','_6','_7','_8',
      1 '_9','10','11','12','13','14','15','16','17','18',
      1 '19','20','21','22','23','24','25','26','27','28',
@@ -201,8 +207,8 @@ c
 c     Temperature
 c
 C      t=301.d0
-      t=298.d0
-      xmv=8.20573660809596d-5*t
+C      t=298.d0
+C      xmv=8.20573660809596d-5*t
 
 C****
 c
@@ -223,13 +229,16 @@ C****************
       MMFF_beta=12.0d0
 C*****
       if(imyrank.eq.0)then
-       call fcoord(filen1,unit,dchar,xlabel,asympp(1))
+       call fcoord(filen1,unit,dchar,xlabel,asympp(1),tarray,itcnt)
        close(9)
       endif
 C*******************
 C****Broadcast******
+      call MPI_BCAST(itcnt,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
+      call MPI_BCAST(tarray,itcnt,MPI_DOUBLE_PRECISION,0,
+     1 MPI_COMM_WORLD,ierr)
       call MPI_BCAST(itn,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
-	  call MPI_BCAST(i2,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
+      call MPI_BCAST(i2,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
       call MPI_BCAST(inp,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
       call MPI_BCAST(imp,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
       call MPI_BCAST(igas,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
@@ -237,20 +246,34 @@ C****Broadcast******
       call MPI_BCAST(icoord,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
       call MPI_BCAST(m2,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
       call MPI_BCAST(romax,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-      call MPI_BCAST(fx,len,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-      call MPI_BCAST(fy,len,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-      call MPI_BCAST(fz,len,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-      call MPI_BCAST(pcharge,len,MPI_DOUBLE_PRECISION,0,
+      call MPI_BCAST(fx,ixlen,MPI_DOUBLE_PRECISION,0,
      1 MPI_COMM_WORLD,ierr)
-      call MPI_BCAST(eij,len,MPI_DOUBLE_PRECISION,0,
+      call MPI_BCAST(fy,ixlen,MPI_DOUBLE_PRECISION,0,
      1 MPI_COMM_WORLD,ierr)
-      call MPI_BCAST(RijStar,len,MPI_DOUBLE_PRECISION,0,
+      call MPI_BCAST(fz,ixlen,MPI_DOUBLE_PRECISION,0,
      1 MPI_COMM_WORLD,ierr)
-      call MPI_BCAST(ox,len,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-      call MPI_BCAST(oy,len,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-      call MPI_BCAST(oz,len,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
+      call MPI_BCAST(pcharge,ixlen,MPI_DOUBLE_PRECISION,0,
+     1 MPI_COMM_WORLD,ierr)
+      call MPI_BCAST(eij,ixlen,MPI_DOUBLE_PRECISION,0,
+     1 MPI_COMM_WORLD,ierr)
+      call MPI_BCAST(RijStar,ixlen,MPI_DOUBLE_PRECISION,0,
+     1 MPI_COMM_WORLD,ierr)
+      call MPI_BCAST(ox,ixlen,MPI_DOUBLE_PRECISION,0,
+     1 MPI_COMM_WORLD,ierr)
+      call MPI_BCAST(oy,ixlen,MPI_DOUBLE_PRECISION,0,
+     1 MPI_COMM_WORLD,ierr)
+      call MPI_BCAST(oz,ixlen,MPI_DOUBLE_PRECISION,0,
+     1 MPI_COMM_WORLD,ierr)
 C******k*************
+C***Added loop here over temperature array
+      do itloop=1,itcnt
 C*******************
+c     Temperature
+c
+C      t=301.d0
+C      t=298.d0
+      t=tarray(itloop)
+      xmv=8.20573660809596d-5*t
 c     Lennard-Jones scaling parameters
 c
       eo=1.34d-03*xe
@@ -377,6 +400,9 @@ C***********************************************************
       call mobil2(t,tmm,cs,sdevpc)
 C***********************************************************
 C***********************************************************
+      tmmarray(itloop)=tmm
+      csarray(itloop)=cs
+      sdevarray(itloop)=sdevpc
 c     print out summary
 C********************************
 C***Only print out for 0 node
@@ -392,6 +418,17 @@ c
         write(8,*)'Mobility Calculated under He gas'
        endif
       endif
+C****End temperature loop here
+      enddo
+C****Collective output:
+      write(8,'(t1,a)')'*********Mobility Summary*********'
+      write(8,'(t1,a)')' temp  ,average CCS ,percent error '
+      do itloop=1,itcnt
+       if(imyrank.eq.0)then
+        write(8,'(t1,f7.3,",",e13.6,",",e13.6)')
+     1   tarray(itloop),csarray(itloop)*1.d20,sdevarray(itloop)
+       endif
+      enddo
 C********************************
 C***Only print out for 0 node
 C********************************
@@ -466,28 +503,28 @@ C****
 c
 c     ***************************************************************
 c
-      subroutine fcoord(filen1,unit,dchar,xlabel,asymp)
+      subroutine fcoord(filen1,unit,dchar,xlabel,asymp,tarray,itcnt)
 c
 c     Reads in coordinates and other parameters.
 c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
       character*50 filen1,unit,dchar,xlabel
-      parameter (len=1000)
-      dimension imass(len),xmass(len) 
+      parameter (ixlen=1000)
+      dimension imass(ixlen),xmass(ixlen) 
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
-      common/charge/pcharge(len),k_const(len)
-      common/coordinates/fx(len),fy(len),fz(len),
-     ?ox(len),oy(len),oz(len)
-      common/ljparameters/eolj(len),rolj(len),eox4(len),
-     ?ro6lj(len),ro12lj(len),dro6(len),dro12(len)
-      common/ljparameters2/alphai(len),Ni(len),Ai(len),Gi(len),
-     1 RijStar(len),eij(len)
+      common/charge/pcharge(ixlen),k_const(ixlen)
+      common/coordinates/fx(ixlen),fy(ixlen),fz(ixlen),
+     ?ox(ixlen),oy(ixlen),oz(ixlen)
+      common/ljparameters/eolj(ixlen),rolj(ixlen),eox4(ixlen),
+     ?ro6lj(ixlen),ro12lj(ixlen),dro6(ixlen),dro12(ixlen)
+      common/ljparameters2/alphai(ixlen),Ni(ixlen),Ai(ixlen),Gi(ixlen),
+     1 RijStar(ixlen),eij(ixlen)
       common/mmffN2/alphaN2,NiN2,AiN2,GiN2,RN2Star,MMFF_B,MMFF_beta
       common/mmffHe/alphaHe,NiHe,AiHe,GiHe,RHeStar
-      common/hsparameters/rhs(len),rhs2(len)
+      common/hsparameters/rhs(ixlen),rhs2(ixlen)
       common/trajectory/sw1,sw2,dtsf1,dtsf2,cmin,ifail,ifailc,inwr
       common/angles/theta,phi,gamma
       common/xrandom/i1,i2,i3,i4,i5,i6
@@ -495,6 +532,8 @@ c
       common/mobilcal/b2max(100),parab2max(100),temp1,temp2
       common/mpicon/imyrank,inprocs,imp_per_node,inp_per_node,s_time
       common/runparams/itn,inp,imp,igas
+      character*1000 readline
+      dimension tarray(50)
 c
       write(8,603) filen1
       open (9,file=filen1)
@@ -520,7 +559,46 @@ c
       read(9,*) correct
       write(8,613) correct
 c
-      read(9,*)itn,inp,imp,igas,i2
+C      read(9,*)itn,inp,imp,igas,i2
+      read(9,'(t1,a1000)')readline
+      ilen=len(trim(readline))
+      isw=0
+      k=0
+      itcnt=0
+      do i=1,ilen
+       if(isw.eq.1)then
+        if(readline(i:i).eq.' '.or.i.eq.ilen)then
+         ifin=i-1
+         if(i.eq.ilen)ifin=i
+         isw=0
+         k=k+1
+         if(k.eq.1)then
+          read(readline(istart:ifin),*)itn
+         elseif(k.eq.2)then
+          read(readline(istart:ifin),*)inp
+         elseif(k.eq.3)then
+          read(readline(istart:ifin),*)imp
+         elseif(k.eq.4)then
+          read(readline(istart:ifin),*)igas
+         elseif(k.eq.5)then
+          read(readline(istart:ifin),*)i2
+         elseif(k.ge.6)then
+          itcnt=itcnt+1
+          read(readline(istart:ifin),*)tarray(itcnt)
+         endif
+        endif
+       endif
+       if(isw.eq.0)then
+        if(readline(i:i).ne.' ')then
+         istart=i
+         isw=1
+        endif
+       endif
+      enddo
+C***PATCH PATCH
+C***PATCH PATCH
+C***PATCH PATCH
+C***PATCH PATCH
 C****node 0 can read in coord. then broadcast
       if(igas.eq.2)then
        enersca=0.80d0
@@ -700,20 +778,20 @@ c     Rotates the cluster/molecule to a random orientation.
 c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
-      parameter (len=1000)
+      parameter (ixlen=1000)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
-      common/charge/pcharge(len),k_const(len)
-      common/coordinates/fx(len),fy(len),fz(len),
-     ?ox(len),oy(len),oz(len)
-      common/ljparameters/eolj(len),rolj(len),eox4(len),
-     ?ro6lj(len),ro12lj(len),dro6(len),dro12(len)
-      common/ljparameters2/alphai(len),Ni(len),Ai(len),Gi(len),
-     1 RijStar(len),eij(len)
+      common/charge/pcharge(ixlen),k_const(ixlen)
+      common/coordinates/fx(ixlen),fy(ixlen),fz(ixlen),
+     ?ox(ixlen),oy(ixlen),oz(ixlen)
+      common/ljparameters/eolj(ixlen),rolj(ixlen),eox4(ixlen),
+     ?ro6lj(ixlen),ro12lj(ixlen),dro6(ixlen),dro12(ixlen)
+      common/ljparameters2/alphai(ixlen),Ni(ixlen),Ai(ixlen),Gi(ixlen),
+     1 RijStar(ixlen),eij(ixlen)
       common/mmffN2/alphaN2,NiN2,AiN2,GiN2,RN2Star,MMFF_B,MMFF_beta
       common/mmffHe/alphaHe,NiHe,AiHe,GiHe,RHeStar
-      common/hsparameters/rhs(len),rhs2(len)
+      common/hsparameters/rhs(ixlen),rhs2(ixlen)
       common/trajectory/sw1,sw2,dtsf1,dtsf2,cmin,ifail,ifailc,inwr
       common/angles/theta,phi,gamma
       common/xrandom/i1,i2,i3,i4,i5,i6
@@ -740,20 +818,20 @@ c     Rotates the cluster/molecule.
 c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
-      parameter (len=1000)
+      parameter (ixlen=1000)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
-      common/charge/pcharge(len),k_const(len)
-      common/coordinates/fx(len),fy(len),fz(len),
-     ?ox(len),oy(len),oz(len)
-      common/ljparameters/eolj(len),rolj(len),eox4(len),
-     ?ro6lj(len),ro12lj(len),dro6(len),dro12(len)
-      common/ljparameters2/alphai(len),Ni(len),Ai(len),Gi(len),
-     1 RijStar(len),eij(len)
+      common/charge/pcharge(ixlen),k_const(ixlen)
+      common/coordinates/fx(ixlen),fy(ixlen),fz(ixlen),
+     ?ox(ixlen),oy(ixlen),oz(ixlen)
+      common/ljparameters/eolj(ixlen),rolj(ixlen),eox4(ixlen),
+     ?ro6lj(ixlen),ro12lj(ixlen),dro6(ixlen),dro12(ixlen)
+      common/ljparameters2/alphai(ixlen),Ni(ixlen),Ai(ixlen),Gi(ixlen),
+     1 RijStar(ixlen),eij(ixlen)
       common/mmffN2/alphaN2,NiN2,AiN2,GiN2,RN2Star,MMFF_B,MMFF_beta
       common/mmffHe/alphaHe,NiHe,AiHe,GiHe,RHeStar
-      common/hsparameters/rhs(len),rhs2(len)
+      common/hsparameters/rhs(ixlen),rhs2(ixlen)
       common/trajectory/sw1,sw2,dtsf1,dtsf2,cmin,ifail,ifailc,inwr
       common/angles/theta,phi,gamma
       common/xrandom/i1,i2,i3,i4,i5,i6
@@ -837,21 +915,21 @@ c     Subroutine to calculate L-J + ion-dipole potential.
 c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
-      parameter (len=1000)
+      parameter (ixlen=1000)
       character*4 dchar
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
-      common/charge/pcharge(len),k_const(len)
-      common/coordinates/fx(len),fy(len),fz(len),
-     ?ox(len),oy(len),oz(len)
-      common/ljparameters/eolj(len),rolj(len),eox4(len),
-     ?ro6lj(len),ro12lj(len),dro6(len),dro12(len)
-      common/ljparameters2/alphai(len),Ni(len),Ai(len),Gi(len),
-     1 RijStar(len),eij(len)
+      common/charge/pcharge(ixlen),k_const(ixlen)
+      common/coordinates/fx(ixlen),fy(ixlen),fz(ixlen),
+     ?ox(ixlen),oy(ixlen),oz(ixlen)
+      common/ljparameters/eolj(ixlen),rolj(ixlen),eox4(ixlen),
+     ?ro6lj(ixlen),ro12lj(ixlen),dro6(ixlen),dro12(ixlen)
+      common/ljparameters2/alphai(ixlen),Ni(ixlen),Ai(ixlen),Gi(ixlen),
+     1 RijStar(ixlen),eij(ixlen)
       common/mmffN2/alphaN2,NiN2,AiN2,GiN2,RN2Star,MMFF_B,MMFF_beta
       common/mmffHe/alphaHe,NiHe,AiHe,GiHe,RHeStar
-      common/hsparameters/rhs(len),rhs2(len)
+      common/hsparameters/rhs(ixlen),rhs2(ixlen)
       common/trajectory/sw1,sw2,dtsf1,dtsf2,cmin,ifail,ifailc,inwr
       common/angles/theta,phi,gamma
       common/xrandom/i1,i2,i3,i4,i5,i6
@@ -960,21 +1038,21 @@ c     Subroutine to calculate L-J + ion-dipole potential.
 c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
-      parameter (len=1000)
+      parameter (ixlen=1000)
       character*4 dchar
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
-      common/charge/pcharge(len),k_const(len)
-      common/coordinates/fx(len),fy(len),fz(len),
-     ?ox(len),oy(len),oz(len)
-      common/ljparameters/eolj(len),rolj(len),eox4(len),
-     ?ro6lj(len),ro12lj(len),dro6(len),dro12(len)
-      common/ljparameters2/alphai(len),Ni(len),Ai(len),Gi(len),
-     1 RijStar(len),eij(len)
+      common/charge/pcharge(ixlen),k_const(ixlen)
+      common/coordinates/fx(ixlen),fy(ixlen),fz(ixlen),
+     ?ox(ixlen),oy(ixlen),oz(ixlen)
+      common/ljparameters/eolj(ixlen),rolj(ixlen),eox4(ixlen),
+     ?ro6lj(ixlen),ro12lj(ixlen),dro6(ixlen),dro12(ixlen)
+      common/ljparameters2/alphai(ixlen),Ni(ixlen),Ai(ixlen),Gi(ixlen),
+     1 RijStar(ixlen),eij(ixlen)
       common/mmffN2/alphaN2,NiN2,AiN2,GiN2,RN2Star,MMFF_B,MMFF_beta
       common/mmffHe/alphaHe,NiHe,AiHe,GiHe,RHeStar
-      common/hsparameters/rhs(len),rhs2(len)
+      common/hsparameters/rhs(ixlen),rhs2(ixlen)
       common/trajectory/sw1,sw2,dtsf1,dtsf2,cmin,ifail,ifailc,inwr
       common/angles/theta,phi,gamma
       common/xrandom/i1,i2,i3,i4,i5,i6
@@ -1183,20 +1261,20 @@ c
       include 'mpif.h'
       integer ns,nw,l
       dimension w(6),dw(6)
-      parameter (len=1000)
+      parameter (ixlen=1000)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
-      common/charge/pcharge(len),k_const(len)
-      common/coordinates/fx(len),fy(len),fz(len),
-     ?ox(len),oy(len),oz(len)
-      common/ljparameters/eolj(len),rolj(len),eox4(len),
-     ?ro6lj(len),ro12lj(len),dro6(len),dro12(len)
-      common/ljparameters2/alphai(len),Ni(len),Ai(len),Gi(len),
-     1 RijStar(len),eij(len)
+      common/charge/pcharge(ixlen),k_const(ixlen)
+      common/coordinates/fx(ixlen),fy(ixlen),fz(ixlen),
+     ?ox(ixlen),oy(ixlen),oz(ixlen)
+      common/ljparameters/eolj(ixlen),rolj(ixlen),eox4(ixlen),
+     ?ro6lj(ixlen),ro12lj(ixlen),dro6(ixlen),dro12(ixlen)
+      common/ljparameters2/alphai(ixlen),Ni(ixlen),Ai(ixlen),Gi(ixlen),
+     1 RijStar(ixlen),eij(ixlen)
       common/mmffN2/alphaN2,NiN2,AiN2,GiN2,RN2Star,MMFF_B,MMFF_beta
       common/mmffHe/alphaHe,NiHe,AiHe,GiHe,RHeStar
-      common/hsparameters/rhs(len),rhs2(len)
+      common/hsparameters/rhs(ixlen),rhs2(ixlen)
       common/trajectory/sw1,sw2,dtsf1,dtsf2,cmin,ifail,ifailc,inwr
       common/angles/theta,phi,gamma
       common/xrandom/i1,i2,i3,i4,i5,i6
@@ -1404,20 +1482,20 @@ c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
       dimension w(6),dw(6)
-      parameter (len=1000) 
+      parameter (ixlen=1000) 
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
-      common/charge/pcharge(len),k_const(len)
-      common/coordinates/fx(len),fy(len),fz(len),
-     ?ox(len),oy(len),oz(len)
-      common/ljparameters/eolj(len),rolj(len),eox4(len), 
-     ?ro6lj(len),ro12lj(len),dro6(len),dro12(len)
-      common/ljparameters2/alphai(len),Ni(len),Ai(len),Gi(len),
-     1 RijStar(len),eij(len)
+      common/charge/pcharge(ixlen),k_const(ixlen)
+      common/coordinates/fx(ixlen),fy(ixlen),fz(ixlen),
+     ?ox(ixlen),oy(ixlen),oz(ixlen)
+      common/ljparameters/eolj(ixlen),rolj(ixlen),eox4(ixlen), 
+     ?ro6lj(ixlen),ro12lj(ixlen),dro6(ixlen),dro12(ixlen)
+      common/ljparameters2/alphai(ixlen),Ni(ixlen),Ai(ixlen),Gi(ixlen),
+     1 RijStar(ixlen),eij(ixlen)
       common/mmffN2/alphaN2,NiN2,AiN2,GiN2,RN2Star,MMFF_B,MMFF_beta
       common/mmffHe/alphaHe,NiHe,AiHe,GiHe,RHeStar
-      common/hsparameters/rhs(len),rhs2(len)
+      common/hsparameters/rhs(ixlen),rhs2(ixlen)
       common/trajectory/sw1,sw2,dtsf1,dtsf2,cmin,ifail,ifailc,inwr
       common/angles/theta,phi,gamma
       common/xrandom/i1,i2,i3,i4,i5,i6
@@ -1519,20 +1597,20 @@ c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
       dimension w(6),dw(6)
-      parameter (len=1000)
+      parameter (ixlen=1000)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
-      common/charge/pcharge(len),k_const(len)
-      common/coordinates/fx(len),fy(len),fz(len),
-     ?ox(len),oy(len),oz(len)
-      common/ljparameters/eolj(len),rolj(len),eox4(len),
-     ?ro6lj(len),ro12lj(len),dro6(len),dro12(len)
-      common/ljparameters2/alphai(len),Ni(len),Ai(len),Gi(len),
-     1 RijStar(len),eij(len)
+      common/charge/pcharge(ixlen),k_const(ixlen)
+      common/coordinates/fx(ixlen),fy(ixlen),fz(ixlen),
+     ?ox(ixlen),oy(ixlen),oz(ixlen)
+      common/ljparameters/eolj(ixlen),rolj(ixlen),eox4(ixlen),
+     ?ro6lj(ixlen),ro12lj(ixlen),dro6(ixlen),dro12(ixlen)
+      common/ljparameters2/alphai(ixlen),Ni(ixlen),Ai(ixlen),Gi(ixlen),
+     1 RijStar(ixlen),eij(ixlen)
       common/mmffN2/alphaN2,NiN2,AiN2,GiN2,RN2Star,MMFF_B,MMFF_beta
       common/mmffHe/alphaHe,NiHe,AiHe,GiHe,RHeStar
-      common/hsparameters/rhs(len),rhs2(len)
+      common/hsparameters/rhs(ixlen),rhs2(ixlen)
       common/trajectory/sw1,sw2,dtsf1,dtsf2,cmin,ifail,ifailc,inwr
       common/angles/theta,phi,gamma
       common/xrandom/i1,i2,i3,i4,i5,i6
@@ -1584,20 +1662,20 @@ c
       dimension pgst(100),wgst(100)
       dimension q1st(100),q2st(100),cosx(0:500)
       dimension om11st(100),om12st(100),om13st(100),om22st(100)
-      parameter (len=1000)
+      parameter (ixlen=1000)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
-      common/charge/pcharge(len),k_const(len)
-      common/coordinates/fx(len),fy(len),fz(len),
-     ?ox(len),oy(len),oz(len)
-      common/ljparameters/eolj(len),rolj(len),eox4(len),
-     ?ro6lj(len),ro12lj(len),dro6(len),dro12(len)
-      common/ljparameters2/alphai(len),Ni(len),Ai(len),Gi(len),
-     1 RijStar(len),eij(len)
+      common/charge/pcharge(ixlen),k_const(ixlen)
+      common/coordinates/fx(ixlen),fy(ixlen),fz(ixlen),
+     ?ox(ixlen),oy(ixlen),oz(ixlen)
+      common/ljparameters/eolj(ixlen),rolj(ixlen),eox4(ixlen),
+     ?ro6lj(ixlen),ro12lj(ixlen),dro6(ixlen),dro12(ixlen)
+      common/ljparameters2/alphai(ixlen),Ni(ixlen),Ai(ixlen),Gi(ixlen),
+     1 RijStar(ixlen),eij(ixlen)
       common/mmffN2/alphaN2,NiN2,AiN2,GiN2,RN2Star,MMFF_B,MMFF_beta
       common/mmffHe/alphaHe,NiHe,AiHe,GiHe,RHeStar
-      common/hsparameters/rhs(len),rhs2(len)
+      common/hsparameters/rhs(ixlen),rhs2(ixlen)
       common/trajectory/sw1,sw2,dtsf1,dtsf2,cmin,ifail,ifailc,inwr
       common/angles/theta,phi,gamma
       common/xrandom/i1,i2,i3,i4,i5,i6
@@ -1667,7 +1745,8 @@ c
         if(imyrank.eq.0)then
          write(8,602) iatom,fx(iatom),fy(iatom),fz(iatom),hold
         else
-         write(1000+imyrank,602) iatom,fx(iatom),fy(iatom),fz(iatom),hold
+         write(1000+imyrank,602) iatom,fx(iatom),fy(iatom),fz(iatom),
+     1    hold
         endif
 1001   continue     
        if(imyrank.eq.0)close(8)
@@ -2504,21 +2583,21 @@ c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
       character*30 unit,dchar,dummy
-      parameter (len=1000)
-      dimension imass(len),xmass(len) 
+      parameter (ixlen=1000)
+      dimension imass(ixlen),xmass(ixlen) 
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
-      common/charge/pcharge(len),k_const(len)
-      common/coordinates/fx(len),fy(len),fz(len),
-     ?ox(len),oy(len),oz(len)
-      common/ljparameters/eolj(len),rolj(len),eox4(len),
-     ?ro6lj(len),ro12lj(len),dro6(len),dro12(len)
-      common/ljparameters2/alphai(len),Ni(len),Ai(len),Gi(len),
-     1 RijStar(len),eij(len)
+      common/charge/pcharge(ixlen),k_const(ixlen)
+      common/coordinates/fx(ixlen),fy(ixlen),fz(ixlen),
+     ?ox(ixlen),oy(ixlen),oz(ixlen)
+      common/ljparameters/eolj(ixlen),rolj(ixlen),eox4(ixlen),
+     ?ro6lj(ixlen),ro12lj(ixlen),dro6(ixlen),dro12(ixlen)
+      common/ljparameters2/alphai(ixlen),Ni(ixlen),Ai(ixlen),Gi(ixlen),
+     1 RijStar(ixlen),eij(ixlen)
       common/mmffN2/alphaN2,NiN2,AiN2,GiN2,RN2Star,MMFF_B,MMFF_beta
       common/mmffHe/alphaHe,NiHe,AiHe,GiHe,RHeStar
-      common/hsparameters/rhs(len),rhs2(len)
+      common/hsparameters/rhs(ixlen),rhs2(ixlen)
       common/trajectory/sw1,sw2,dtsf1,dtsf2,cmin,ifail,ifailc,inwr
       common/angles/theta,phi,gamma
       common/xrandom/i1,i2,i3,i4,i5,i6

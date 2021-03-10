@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>699</width>
+    <height>443</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>699</width>
+    <height>443</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>699</width>
+    <height>443</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MobCal-MPI Processing Suite</string>
+  </property>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>700</width>
+     <height>411</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="tab_1">
+    <attribute name="title">
+     <string>mfj Creator</string>
+    </attribute>
+    <widget class="QLineEdit" name="t1le_1">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>20</y>
+       <width>521</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string>File path for folder containing .logs to be converted to .mfj</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="t1le_2">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>70</y>
+       <width>521</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="statusTip">
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string>(Optional) File containing a list of logs that should be converted.</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="t1le_3">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>120</y>
+       <width>521</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>C:\open3dtools\bin\sdf2tinkerxyz.exe </string>
+     </property>
+     <property name="placeholderText">
+      <string>Directory that sdf2xyz2sdf was installed in</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="t1l1">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Log Directory</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="t1l2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Log List (.csv)</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="t1l3">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>120</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>sdf2xyz2sdf Directory</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="t1l4">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>170</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Charge</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="t1cb1">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>170</y>
+       <width>87</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>Calc</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Equal</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>None</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="t1l5">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>170</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Cycles</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="t1sb1">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>170</y>
+       <width>91</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>1000</number>
+     </property>
+     <property name="value">
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="t1l6">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>220</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Velocity Integration</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="t1l7">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>270</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Impact Integration</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="t1sb2">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>220</y>
+       <width>87</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>1000</number>
+     </property>
+     <property name="value">
+      <number>48</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="t1sb3">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>270</y>
+       <width>91</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>1000</number>
+     </property>
+     <property name="value">
+      <number>512</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="t1l8">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>220</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Buffer Gas</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="t1cb2">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>220</y>
+       <width>87</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>He</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>N2</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="t1l9">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>270</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Number of Cores</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="t1sb4">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>270</y>
+       <width>91</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>1000</number>
+     </property>
+     <property name="value">
+      <number>8</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="t1l10">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>320</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Temperature List</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="t1le_4">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>320</y>
+       <width>521</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string>Comma delimited list of temperatures (K)</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Energy Weighter</string>
+    </attribute>
+    <widget class="QLineEdit" name="t2le_1">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>20</y>
+       <width>411</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string>File path for folder containing test.csv</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="t2l1">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CSV Directory</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="t2l2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Temperature</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="t2dsb1">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>70</y>
+       <width>71</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <double>1000000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>298.149999999999977</double>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_2">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>20</y>
+       <width>88</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Select File</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>CCS Extractor</string>
+    </attribute>
+    <widget class="QLineEdit" name="t3le_1">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>20</y>
+       <width>521</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string>File path for folder containing .mout</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="t3l1">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Mout Directory</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>612</x>
+     <y>410</y>
+     <width>88</width>
+     <height>34</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Submit</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
