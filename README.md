@@ -3,11 +3,11 @@ Parallelization of the commonly used MobCal suite to calculate ion mobilities an
 
 
 
-#Get in touch
+**Get in touch**
 
 Questions? Comments? Concerns? Email us! 
 
-cieritan@edu.uwaterloo.ca
+cieritano@uwaterloo.ca
 shopkins@uwaterloo.ca
 
 
