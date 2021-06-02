@@ -72,7 +72,7 @@ class Ui_Dialog(object):
         self.t1l7.setObjectName("t1l7")
         self.t1sb2 = QtWidgets.QSpinBox(self.tab_1)
         self.t1sb2.setGeometry(QtCore.QRect(590, 220, 87, 32))
-        self.t1sb2.setMaximum(1000)
+        self.t1sb2.setMaximum(10000)
         self.t1sb2.setProperty("value", 48)
         self.t1sb2.setObjectName("t1sb2")
         self.t1sb3 = QtWidgets.QSpinBox(self.tab_1)
