@@ -100,7 +100,7 @@ c
       dimension tmc(100),
      ?asympp(100)
       character*50 filen1,filen2,unit,dchar,xlabel,infile
-      parameter (ixlen=1000)
+      parameter (ixlen=100000)
       character*2 flend(32)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
@@ -510,7 +510,7 @@ c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
       character*50 filen1,unit,dchar,xlabel
-      parameter (ixlen=1000)
+      parameter (ixlen=100000)
       dimension imass(ixlen),xmass(ixlen) 
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
@@ -778,7 +778,7 @@ c     Rotates the cluster/molecule to a random orientation.
 c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
-      parameter (ixlen=1000)
+      parameter (ixlen=100000)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
@@ -818,7 +818,7 @@ c     Rotates the cluster/molecule.
 c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
-      parameter (ixlen=1000)
+      parameter (ixlen=100000)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
@@ -915,7 +915,7 @@ c     Subroutine to calculate L-J + ion-dipole potential.
 c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
-      parameter (ixlen=1000)
+      parameter (ixlen=100000)
       character*4 dchar
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
@@ -1038,7 +1038,7 @@ c     Subroutine to calculate L-J + ion-dipole potential.
 c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
-      parameter (ixlen=1000)
+      parameter (ixlen=100000)
       character*4 dchar
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
@@ -1261,7 +1261,7 @@ c
       include 'mpif.h'
       integer ns,nw,l
       dimension w(6),dw(6)
-      parameter (ixlen=1000)
+      parameter (ixlen=100000)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
@@ -1482,7 +1482,7 @@ c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
       dimension w(6),dw(6)
-      parameter (ixlen=1000) 
+      parameter (ixlen=100000) 
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
@@ -1597,7 +1597,7 @@ c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
       dimension w(6),dw(6)
-      parameter (ixlen=1000)
+      parameter (ixlen=100000)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
@@ -1662,7 +1662,7 @@ c
       dimension pgst(100),wgst(100)
       dimension q1st(100),q2st(100),cosx(0:500)
       dimension om11st(100),om12st(100),om13st(100),om22st(100)
-      parameter (ixlen=1000)
+      parameter (ixlen=100000)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,mconst,correct,romax,inatom,icoord,iic
@@ -1687,6 +1687,13 @@ C****
       dimension om11stt(100),om12stt(100),om13stt(100),om22stt(100)
       dimension q1stt(100),q2stt(100)
 c     
+C****PATCH PATCH
+		if(imyrank.eq.0)then
+		 abc_time=MPI_WTIME()
+		 delta_time=abc_time-s_time
+		 write(8,*)'Starting mobil2 in ',delta_time,' s from start'
+		endif
+C****PATCH PATCH
       if(im2.eq.0)then
        if(imyrank.eq.0)then
         write(8,631)
@@ -1753,6 +1760,13 @@ c
        call MPI_FINALIZE(ierr)
        stop
       endif
+C****PATCH PATCH
+		if(imyrank.eq.0)then
+		 abc_time=MPI_WTIME()
+		 delta_time=abc_time-s_time
+		 write(8,*)'Got through hold check in ',delta_time
+		endif
+C****PATCH PATCH
 c
 c     determine rmax, emax, and r00 along x, y, and z directions
 c
@@ -1789,7 +1803,15 @@ c
        else
         write(1000+imyrank,614) emaxx/xe,rmaxx*1.0d10,r00x*1.0d10
        endif
-      endif    
+      endif
+C****PATCH PATCH
+		if(imyrank.eq.0)then
+		 abc_time=MPI_WTIME()
+		 delta_time=abc_time-s_time
+		 write(8,*)'determined rmaxx in ',delta_time,' s from start'
+		 write(8,*)'rmaxx=',rmaxx,', ro=',ro
+		endif
+C****PATCH PATCH	  
 c
 C      x=0.d0
 C      z=0.d0
@@ -1903,6 +1925,13 @@ c
         endif
        endif
 2000  continue
+C****PATCH PATCH
+		if(imyrank.eq.0)then
+		 abc_time=MPI_WTIME()
+		 delta_time=abc_time-s_time
+		 write(8,*)'determined gst in ',delta_time,' s from start'
+		endif
+C****PATCH PATCH
 c
 c     determine b2max
 C*****
@@ -1912,7 +1941,9 @@ C*****
       enddo
 C*****
 c
-      dbst2=1.d0
+C      dbst2=1.d0
+	  dbst2=rmaxx/ro
+	  if(dbst2.lt.1.0d0)dbst2=1.0d0
       dbst22=dbst2/10.d0
       cmin=0.0005d0
       if(im2.eq.0)then
@@ -1984,6 +2015,13 @@ C******
       call MPI_BCAST(b2max,100,MPI_DOUBLE_PRECISION,0,
      1 MPI_COMM_WORLD,ierr)
 C*******
+C****PATCH PATCH
+		if(imyrank.eq.0)then
+		 abc_time=MPI_WTIME()
+		 delta_time=abc_time-s_time
+		 write(8,*)'determined b2max in ',delta_time,' s from start'
+		endif
+C****PATCH PATCH
       if(im2.eq.0) then
        if(imyrank.eq.0)then
         write(8,637) 
@@ -2583,7 +2621,7 @@ c
       implicit double precision (a-h,m-z)
       include 'mpif.h'
       character*30 unit,dchar,dummy
-      parameter (ixlen=1000)
+      parameter (ixlen=100000)
       dimension imass(ixlen),xmass(ixlen) 
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
