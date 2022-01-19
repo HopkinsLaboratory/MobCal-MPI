@@ -1,23 +1,6 @@
-import os
-
 #Specify a directory containing log files to be converted into mobcal inputs
 #i.e directory = r'C:\Users\McMahon003\Desktop\Mobcal Script\Test Files'
-directory = r'D:/Uni/PostDoc/Waterloo/OneDrive - University of Waterloo/1_Ab-Initio/07_Anharmonicity/00_Full_Workflow/TMA_H2O/TMA_H2O_1a'
-
-# rename title string in .xyz files
-if True:
-    ffiles = [x for x in os.listdir(directory+'/') if x.lower().endswith('.xyz')]
-    for file in ffiles:
-        f = open(directory+'/'+file, 'r')
-        read = f.readlines()
-        
-        bname_OptFreq = read[1].split()[-1] # only molecule name
-        bname         = bname_OptFreq.rsplit('_',1)[0] # remove '_OptFreq\n'
-        read[1] = bname + '\n'
-        
-        f = open(directory+'/'+file,'w')
-        f.writelines(read)
-        f.close()
+directory = r'C:\Users\Scott Hopkins\Downloads\Test'
 
 #The csv_list will read specified log files in  a .csv
 #i.e csv_list = r'C:\Users\McMahon003\Desktop\Mobcal Script\Test Files\Logs.csv'
@@ -35,10 +18,10 @@ charge = 'calc'
 cycles = 10
 
 #Specify the number of velocity integration points to take. Recommended value is 48. Must be an integer.
-v_integrations = 192
+v_integrations = 48
 
 #Specify the number of impact parameter integration points to take. Recommended value is 512. Must be an integer.
-b_integrations = 800
+b_integrations = 512
 
 #Specify the number of cores you plan to run trajectory method calcs on. Not used in input file creation, but used in error checking. Must be an integer. 
 n_cores = 8
@@ -47,7 +30,7 @@ n_cores = 8
 gas = 'N2'
 
 #Specify the temperature(s) used to calculate CCS. Note must be imported as a list
-temps = [350]
+temps = [298,400,450,700]
 
 
 ####################################################
