@@ -1,6 +1,6 @@
 #Specify a directory containing log files to be converted into mobcal inputs
 #i.e directory = r'C:\Users\McMahon003\Desktop\Mobcal Script\Test Files'
-directory = r'C:\Users\Scott Hopkins\Downloads\Test'
+directory = r'D:\Hopkins_Laboratory\Beer_project\Reaction_Pathway\Ag_Adducts\cis_isohumulone\DFT\MobCal\test'
 
 #The csv_list will read specified log files in  a .csv
 #i.e csv_list = r'C:\Users\McMahon003\Desktop\Mobcal Script\Test Files\Logs.csv'
@@ -21,7 +21,7 @@ cycles = 10
 v_integrations = 48
 
 #Specify the number of impact parameter integration points to take. Recommended value is 512. Must be an integer.
-b_integrations = 512
+b_integrations = 1024
 
 #Specify the number of cores you plan to run trajectory method calcs on. Not used in input file creation, but used in error checking. Must be an integer. 
 n_cores = 8
@@ -30,12 +30,27 @@ n_cores = 8
 gas = 'N2'
 
 #Specify the temperature(s) used to calculate CCS. Note must be imported as a list
-temps = [298,400,450,700]
+temps = [298]
 
 
 ####################################################
 #END USER input
 ####################################################
+
+import os
+
+# rename title string in .xyz files
+files = [x for x in os.listdir(directory+'/') if x.lower().endswith('.xyz')]
+for file in files:
+    f = open(directory+'/'+file, 'r')
+    data = f.readlines()
+    file2 = str(file)
+    data[1] = str(file2[:-4]+'\n')
+    
+    f = open(directory+'/'+file, 'w')
+    f.writelines(data)
+    f.close()
+
 
 #Convert temps list to string
 temps2 = ''
