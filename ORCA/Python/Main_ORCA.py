@@ -13,12 +13,11 @@ def run(directory,csv,sdf2xyz2sdf_Directory,charge,parameters):
 		opf = open(csv,'r')
 		logs = opf.read().split('\n')
 		opf.close()
-		logs = [x for x in logs if x.lower().endswith('.xyz') or x.lower().endswith('out')]
+		logs = [x for x in logs if x.lower().endswith('.xyz') or x.lower().endswith('out') and '_trj' not in x]
 	else:
-		logs = [x for x in os.listdir(directory) if x.lower().endswith('.xyz') or x.lower().endswith('.out')]
+		logs = [x for x in os.listdir(directory) if x.lower().endswith('.xyz') or x.lower().endswith('.out') and '_trj' not in x]
 	print('Process estimated to take '+str(round((len(logs)*2.5+10)/60,2))+' minutes.')
-	print(logs)
-	
+
 	if directory[-1] != '\\':
 		directory = directory+'\\'
 	try:
@@ -55,7 +54,6 @@ def run(directory,csv,sdf2xyz2sdf_Directory,charge,parameters):
 	ESP = []
 	#print(directory)
 	logs = [x for x in os.listdir(directory) if x.lower().endswith('.out')]
-	print(logs)
 	print('Extracting ESP info from logs.\n')
 	for file in logs:
 		opf = open(directory+file,'r')
