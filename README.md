@@ -2,7 +2,6 @@
 Parallelization of the commonly used MobCal suite to calculate ion mobilities and collision cross sections (2.0). For documentation, see the preliminary Quick Start Guide powerpoint. A full MobCal-MPI 2.0 user guide will be available in October 2023.
 
 # Changes in v2.0 <h2>
-
 The latest release of MobCal-MPI (v2.0) expands on its predecessor by implementing two-temperature theory to accuately compute ion mobilities and CCSs at arbitrary field strengths. All functionality from v1.2 is retained, including calulcation of CCSs within the low-field limit.
 
 A summary of the changes are included below:
@@ -18,7 +17,6 @@ For a full description of each change, we direct users to the manuscript accompa
 Analyst 2023, 148 (14), 3257–3273. https://doi.org/10.1039/D3AN00545C.
 
 # Changes in v1.2 <h2>
-
 This release of MobCal-MPI (v 1.2) is equipped with a Python-based Graphical User Interface (GUI) for:
 
 
@@ -39,7 +37,9 @@ This release of MobCal-MPI (v 1.2) is equipped with a Python-based Graphical Use
 Questions? Comments? Concerns? Email us! 
 
 a2haack@uwaterloo.ca
+
 cieritano@uwaterloo.ca
+
 shopkins@uwaterloo.ca
 
 
