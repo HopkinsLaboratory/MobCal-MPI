@@ -32,7 +32,7 @@ This release of MobCal-MPI (v 1.2) is equipped with a Python-based Graphical Use
 
 
 
-**Get in touch**
+# Contact information <h3> 
 
 Questions? Comments? Concerns? Email us! 
 
