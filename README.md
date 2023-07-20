@@ -1,4 +1,4 @@
-![image](https://github.com/HopkinsLaboratory/MobCal-MPI/assets/44277344/f4f0867d-03c2-4969-a332-88ff177ceb61)# MobCal-MPI
+# MobCal-MPI
 Parallelization of the commonly used MobCal suite to calculate ion mobilities and collision cross sections (v1.2). For full documentation, see the MobCal-MPI user guide.
 
 ## Changes in v2.0 <h2>
