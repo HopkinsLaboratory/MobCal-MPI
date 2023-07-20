@@ -1,1 +1,0 @@
-pyuic5 "/home/josh/Downloads/GUI/gui/Mobcal.ui" -o "/home/josh/Downloads/GUI/gui/Mobcal.py" 
