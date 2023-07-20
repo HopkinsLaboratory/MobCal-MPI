@@ -1,7 +1,8 @@
-# MobCal-MPI
-Parallelization of the commonly used MobCal suite to calculate ion mobilities and collision cross sections (v1.2). For full documentation, see the MobCal-MPI user guide.
+# MobCal-MPI 2.0
+Parallelization of the commonly used MobCal suite to calculate ion mobilities and collision cross sections (2.0). For documentation, see the preliminary Quick Start Guide powerpoint. A full MobCal-MPI 2.0 user guide will be available in October 2023.
 
 # Changes in v2.0 <h2>
+
 The latest release of MobCal-MPI (v2.0) expands on its predecessor by implementing two-temperature theory to accuately compute ion mobilities and CCSs at arbitrary field strengths. All functionality from v1.2 is retained, including calulcation of CCSs within the low-field limit.
 
 A summary of the changes are included below:
