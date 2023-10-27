@@ -1,0 +1,22 @@
+# All CCS calculated at Tbath = 298.0 K
+filename            , CCS [A**2],  errCCS [A**2] 
+AMIFOSTINE_1        ,  145.32   ,    1.44
+AMIFOSTINE_2        ,  141.65   ,    1.46
+AMIFOSTINE_3        ,  139.16   ,    1.43
+AMIFOSTINE_4        ,  138.89   ,    1.42
+AZAMETHIPHOS_1      ,  159.50   ,    1.67
+AZAMETHIPHOS_2      ,  159.54   ,    1.64
+AZAMETHIPHOS_3      ,  159.93   ,    1.50
+AZAMETHIPHOS_4      ,  159.84   ,    1.52
+AZAMETHIPHOS_5      ,  159.57   ,    1.48
+AZAMETHIPHOS_6      ,  157.83   ,    1.47
+BENTHIAVALICARB_1   ,  182.49   ,    1.66
+BENTHIAVALICARB_2   ,  172.70   ,    1.62
+BENTHIAVALICARB_3   ,  178.97   ,    1.74
+BENTHIAVALICARB_4   ,  178.10   ,    1.80
+BENTHIAVALICARB_5   ,  171.53   ,    1.70
+BENTHIAVALICARB_6   ,  181.41   ,    1.71
+BROMCHLORBUTEROL_R_1,  159.42   ,    1.80
+BROMCHLORBUTEROL_R_2,  165.40   ,    1.94
+BROMCHLORBUTEROL_R_3,  166.25   ,    2.04
+BROMCHLORBUTEROL_R_4,  159.36   ,    1.74

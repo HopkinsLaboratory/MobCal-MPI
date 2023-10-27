@@ -1,0 +1,9 @@
+filename,T_bath[K],CCS [A**2],errCCS [A**2]
+AMIFOSTINE_1, 298.00, 145.32, 1.44
+AMIFOSTINE_2, 298.00, 141.65, 1.46
+AMIFOSTINE_3, 298.00, 139.16, 1.43
+AMIFOSTINE_4, 298.00, 138.89, 1.42
+Aniline_0   , 370.00, 109.89, 0.80
+Benalaxyl_0a, 370.00, 157.46, 1.28
+Benalaxyl_0b, 370.00, 157.34, 1.32
+Benalaxyl_0c, 370.00, 157.63, 1.32
