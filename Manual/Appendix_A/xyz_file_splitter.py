@@ -30,7 +30,7 @@ with open(energies_path, 'w') as opf2:
     opf2.write('Filename,Energies,Relative Energy (kJ/mol)\n')
 
 # Split the data into conformers
-split_by = str(data.split('\n')[0].strip()) + '\n        -'
+split_by = str(data.split('\n')[0].strip()) + '\n' + str(data.split('\n')[1].split('-')[0])
 data = data.split(split_by)[1:]
 
 # Get the minimum energy
