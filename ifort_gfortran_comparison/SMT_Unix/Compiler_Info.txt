@@ -1,0 +1,37 @@
+# commands to check the version/settings of mpifort
+
+$ mpifort --version
+GNU Fortran (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
+
+
+$ mpirun --version
+mpirun (Open MPI) 4.1.2
+
+
+$ ompi_info | grep Ident
+            Ident string: 4.1.2            # version of OpenMPI
+
+
+$ mpifort -show
+gfortran -I/usr/lib/x86_64-linux-gnu/openmpi/lib/../../fortran/gfortran-mod-15/openmpi -I/usr/lib/x86_64-linux-gnu/openmpi/lib -L/usr/lib/x86_64-linux-gnu/openmpi/lib/fortran/gfortran -lmpi_usempif08 -lmpi_usempi_ignore_tkr -lmpi_mpifh -lmpi -lopen-rte -lopen-pal -lhwloc -levent_core -levent_pthreads -lm -lz
+
+
+
+# optimizing flag -Og
+https://stackoverflow.com/questions/3676322/what-flags-to-set-for-gfortran-compiler-to-catch-faulty-code
+https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
+-> makes the gfortran code almost 2x as fast!
+
+
+
+# useful links:
+https://manpages.ubuntu.com/manpages/xenial/man1/mpifort.openmpi.1.html
+https://www.mpich.org/static/docs/v3.2/www1/mpifort.html
+https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
+
+
+
+# runmob_OpenMPI_Unix.sh
+ - script that runs all *.mfj files within the current folder directly
+ - no use of slurm !!!
+ - to be used on personal UNIX machines (where no slurm is used)

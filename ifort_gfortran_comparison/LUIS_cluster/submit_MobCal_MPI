@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+import sys
+import os
+import time
+
+submit_dir = os.getcwd()
+
+def submit_file(File,options):
+    ## file names
+    basen = f'{File[:-4]}'
+    basen_time = f'{File[:-4]}_{str(int(time.time()))}'
+    run_file = f'{basen_time}.run'
+    slurm_file = f'{submit_dir}/{basen_time}.slurm'
+    ## write .run file
+    opf = open(run_file,'w')
+    opf.write(f'{basen}.mfj' + '\n')
+    opf.write(f'{basen}.mout' + '\n')
+    opf.close()
+    ## write .slurm file
+    opf = open(slurm_file,'w')
+    # SBATCH commands
+    opf.write('#!/bin/bash -l' + '\n')
+    opf.write('#SBATCH --job-name=M_%s' %basen + '\n')
+    opf.write('#SBATCH --partition=' + options[9] + '\n')
+    opf.write('#SBATCH --nodes=1'+'\n')
+    opf.write('#SBATCH --ntasks-per-node=' + options[3] + '\n')
+    opf.write('#SBATCH --mem=' + options[5] +'\n')
+    opf.write('#SBATCH --time=' + options[7] + '\n')
+    opf.write('#SBATCH --output=' + basen_time + '.sout' + '\n')
+    opf.write('\n')
+    opf.write('# Changing to submitting dir and copying all files related to the submission job to $TMPDIR' + '\n')
+    opf.write('cd $SLURM_SUBMIT_DIR' + '\n')
+    opf.write('\n')
+    opf.write('# JOB START (loading modules)' + '\n')
+    opf.write('module load GCC/11.2.0 OpenMPI/4.1.1' + '\n')
+    opf.write('\n')
+    opf.write(f'srun --cpu_bind=cores --distribution=block:cyclic ./MobCal_MPI2_230228.exe {run_file}' + '\n')
+    ## close slurm file
+    opf.close()
+    ## submit
+    submit = f'sbatch {slurm_file}'
+    print(submit)
+    os.system(submit)
+
+try:
+    #submitting multiple jobs
+    if sys.argv[1] == 'all' and len(sys.argv) == 10:
+        files = [x for x in os.listdir(submit_dir) if x.lower().endswith('.mfj')]
+        print('Submitting %i jobs' %(len(files)) + '\n')
+        print(files)
+        print('\n')
+        for i,File in enumerate(files):
+            submit_file(File,sys.argv)
+            time.sleep(1)
+
+    #Submitting a single job
+    elif len(sys.argv) == 10:
+        print('Submitting one job')
+        print(sys.argv[1])
+        submit_file(sys.argv[1],sys.argv)
+
+except (IndexError) as e:
+    print('Format as follows:\nsubmit_MobCal_MPI file_name.mfj -n # -m ####mb -t #d-#h:#m -p lena')
