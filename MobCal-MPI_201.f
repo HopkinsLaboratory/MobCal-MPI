@@ -1,6 +1,6 @@
-C     PROGRAM MOBCAL_MPI v2.0
+C     PROGRAM MOBCAL_MPI v2.0.1
 C
-C     Mobility Calculation program published in ...
+C     Mobility Calculation program published in
 C       Haack, A.; Ieritano, C.; Hopkins, W. S. MobCal-MPI 2.0:
 C       An Accurate and Parallelized Package for Calculating Field-
 C       Dependent Collision Cross Sections and Ion Mobilities.
@@ -114,8 +114,8 @@ C     potential and more exhaustive paramater set which needs to be
 C     included as input
 c
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       parameter(inpmax=201)
       dimension tmc(100),
      ?asympp(100)
@@ -583,8 +583,8 @@ c
 c
 c     Reads in coordinates and other parameters.
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       character*50 filen1,unit,dchar,xlabel
       parameter (ixlen=1000,inpmax=201)
       dimension imass(ixlen),xmass(ixlen) 
@@ -694,8 +694,11 @@ C****node 0 can read in coord. then broadcast
        enersca=1.275d0
        distsca=0.825d0
       else
-       enersca=0.81d0
-       distsca=0.98d0
+C** updated Oct 2023
+       enersca=0.93d0
+       distsca=0.97d0
+c       enersca=0.81d0
+c       distsca=0.98d0
       endif
 c
       if(dchar.eq.'equal') write(8,630) 
@@ -870,8 +873,8 @@ c
 c
 c     Rotates the cluster/molecule to a random orientation.  
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       parameter (ixlen=1000,inpmax=201)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
@@ -910,8 +913,8 @@ c
 c
 c     Rotates the cluster/molecule.  
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       parameter (ixlen=1000,inpmax=201)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
@@ -1007,8 +1010,8 @@ c
 c
 c     Subroutine to calculate L-J + ion-dipole potential.
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       parameter (ixlen=1000,inpmax=201)
       character*4 dchar
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
@@ -1130,8 +1133,8 @@ c
 c
 c     Subroutine to calculate L-J + ion-dipole potential.
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       parameter (ixlen=1000,inpmax=201)
       character*4 dchar
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
@@ -1363,8 +1366,8 @@ c     Calculates trajectory. Adapted from code written by George Schatz
 c     A fixed step integrator is used which combines a runge-kutta-gill
 c     initiator with an adams-moulton predictor-corrector propagator.
 c     
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       integer ns,nw,l
       dimension w(6),dw(6)
       parameter (ixlen=1000,inpmax=201)
@@ -1586,8 +1589,8 @@ c     incremented to tell the subroutine when to switch between
 c     integration methods. DIFFEQ calls subroutine DERIV to define 
 c     the equations of motion to be integrated.
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       dimension w(6),dw(6)
       parameter (ixlen=1000,inpmax=201) 
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
@@ -1701,8 +1704,8 @@ c
 c     Defines Hamilton's equations of motion as the time derivatives 
 c     of the coordinates and momenta.
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       dimension w(6),dw(6)
       parameter (ixlen=1000,inpmax=201)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
@@ -1763,8 +1766,8 @@ c
 c
 c     Subroutine to determine grids for mobil2 
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       parameter (ixlen=1000,inpmax=201)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
@@ -2231,6 +2234,14 @@ c*AH
      1   MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
         call MPI_REDUCE(temp3,mpitemp3,1,
      1   MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+c* 231004
+        call MPI_BCAST(mpitemp1,1,MPI_DOUBLE_PRECISION,0,
+     1 MPI_COMM_WORLD,ierr)
+        call MPI_BCAST(mpitemp2,1,MPI_DOUBLE_PRECISION,0,
+     1 MPI_COMM_WORLD,ierr)
+        call MPI_BCAST(mpitemp3,1,MPI_DOUBLE_PRECISION,0,
+     1 MPI_COMM_WORLD,ierr)
+c* 231004 end
 c
 C* printing of Q*(l) for each loop of itn
 c
@@ -2380,8 +2391,8 @@ c
 c     Subroutine to get the matrix elements a_rs(l) within 
 c     2TT at current Teff. see Table 6-2-1 of Mason&McDaniel 1988
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       parameter (ixlen=1000,inpmax=201)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
@@ -2402,7 +2413,7 @@ c
       common/xrandom/i1,i2,i3,i4,i5,i6
       common/scaling/enersca,distsca
 C****
-      common/mobilcal/b2max(inpmax),parab2max(inpmax),temp1,temp2,temp3
+      common/mobilcal/b2max(inpmax),parab2max(inpmax)
       common/mobilgrid/pgst(inpmax),wgst(inpmax),q1st(inpmax),
      1  q2st(inpmax),q3st(inpmax),q1STD(inpmax),q2STD(inpmax),
      1  q3STD(inpmax)
@@ -2482,8 +2493,8 @@ c
 c     Subroutine to calculate drift velocity and field strength within
 c     2TT using matrix elements gamma(Teff). see Viehland&Mason1978
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       parameter (ixlen=1000,inpmax=201)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
@@ -2504,7 +2515,7 @@ c
       common/xrandom/i1,i2,i3,i4,i5,i6
       common/scaling/enersca,distsca
 C****
-      common/mobilcal/b2max(inpmax),parab2max(inpmax),temp1,temp2,temp3
+      common/mobilcal/b2max(inpmax),parab2max(inpmax)
       common/mobilgrid/pgst(inpmax),wgst(inpmax),q1st(inpmax),
      1  q2st(inpmax),q3st(inpmax),q1STD(inpmax),q2STD(inpmax),
      1  q3STD(inpmax)
@@ -2571,8 +2582,8 @@ c
 c     Subroutine to determine average mobility by trajectory method. 
 c     All integrations Monte Carlo (except over velocity).
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       parameter (ixlen=1000,inpmax=201)
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
@@ -2594,7 +2605,7 @@ c
       common/scaling/enersca,distsca
       common/empcorr/Aec,Bec
 C****
-      common/mobilcal/b2max(inpmax),parab2max(inpmax),temp1,temp2,temp3
+      common/mobilcal/b2max(inpmax),parab2max(inpmax)
       common/mobilgrid/pgst(inpmax),wgst(inpmax),q1st(inpmax),
      1  q2st(inpmax),q3st(inpmax),q1STD(inpmax),q2STD(inpmax),
      1  q3STD(inpmax)
@@ -3187,8 +3198,8 @@ c
 c
 c     Reads in a new set of coordinates
 c
+      use mpi
       implicit double precision (a-h,m-z)
-      include 'mpif.h'
       character*30 unit,dchar,dummy
       parameter (ixlen=1000)
       dimension imass(ixlen),xmass(ixlen) 
