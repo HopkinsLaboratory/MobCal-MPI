@@ -1,85 +1,95 @@
 import os
 import random
+from PyQt5.QtWidgets import QMessageBox
 
-def xyz_to_mfj(directory,xyz,key,mfj,charge,parameters):
-	#Get the filename
-	filename = (mfj.split("."))[0].replace('/','\\')
-	filename = filename[filename.rfind('\\')+1:]
+def xyz_to_mfj(directory, xyz, key, mfj, charge, parameters):
 	
-	#open files and grab all data
-	opf = open(xyz,"r")
-	xyz_lines = opf.readlines()
-	opf.close()
+	def write_error(filename, atom_number):
+		error_file_path = os.path.join(mfj[:mfj.rfind('\\')+1], 'Errors.csv')
+		mode = 'w' if not os.path.isfile(error_file_path) else 'a'
+		
+		with open(error_file_path, mode) as error:
+			error.write(f'{filename},{atom_number}\n')
 
-	opf = open(key,"r")
-	key_lines = opf.readlines()
-	opf.close()
+	# Read xyz file
+	with open(xyz, 'r') as xyz_file:
+		xyz_lines = xyz_file.readlines()
 
-	opf = open(directory+"mass.prm","r")
-	mass_lines = opf.readlines()
-	opf.close()
+	# Read key file
+	with open(key, 'r') as key_file:
+		key_lines = key_file.readlines()
 
-	opf = open(directory+"vdw.prm","r")
-	vdw_lines = opf.readlines()
-	opf.close()
+	# Read mass.prm file
+	with open(os.path.join(directory, 'mass.prm'), 'r') as mass_file:
+		mass_lines = mass_file.readlines()
 
-	#Read the xyz file and obtain the number of atoms and get all x,y,z data
-	atom_num = int((xyz_lines[0].split()[0]))
-	xyz_data = []
-	for i in range(1,1+atom_num):
-		xyz_data.append(xyz_lines[i].split())		
+	# Read vdw.prm file
+	with open(os.path.join(directory, 'vdw.prm'), 'r') as vdw_file:
+		vdw_lines = vdw_file.readlines()
 
-	#Get the atom info in the key file
-	key_data = []
-	for i in range(0,atom_num):
-		key_data.append(key_lines[i].split())
+	atom_num = int(xyz_lines[0].split()[0])
+	xyz_data = [line.split() for line in xyz_lines[1:atom_num + 1]]
+	key_data = [line.split() for line in key_lines[:atom_num]]
 
-	#Get the atom and mass info from the mass file
+	#dictionaries for storing information from .prm files
 	atom_info = {}
 	mass_info = {}
-	for i in range(len(mass_lines)):
-		parsed = mass_lines[i].split()
-		atom_info[(parsed)[1]] = parsed[2]
-		mass_info[(parsed)[2]] = parsed[6]
+	for line in mass_lines:
+		parsed = line.split()
+		atom_info[parsed[1]] = parsed[2]
+		mass_info[parsed[2]] = parsed[6]
 
-	#Get all relevant vdw info from vdw file
 	vdw_info = {}
-	for i in range(len(vdw_lines)):
-		parsed = vdw_lines[i].split()
-		vdw_info[(parsed)[0]] = [parsed[1],parsed[2],parsed[3],parsed[4]]
+	for line in vdw_lines:
+		parsed = line.split()
+		vdw_info[parsed[0]] = [parsed[1], parsed[2], parsed[3], parsed[4]]
 
-	opf = open(mfj,"w")
-	seed = random.randint(1000000,1000000000)
-	seed = -(seed)
-	spacing = '%s\n%s\n%s\n%s\n%s\n%s\n%s %s %s %s %s %s\n' #regex for header
-	#We want to write the filename, 1, number of atoms, ang, calc, and 1 to the header
-	opf.write(spacing%(filename,'1',str(atom_num),'ang',charge,parameters[4],parameters[0],parameters[1],parameters[2],parameters[3],seed,parameters[5])) # changed in V2
-	for i in range(atom_num):
-		spacing = '%10s	   %10s	   %10s	   %7s	  %10s	  %5s	 %5s	%5s	   %5s\n' #regex for line
-		try: #Get the mass for the atom
-			atom_mass = str(mass_info[atom_info[xyz_data[i][5]]])
-		except (NameError,KeyError): #If the atom type cannot be determined in the mass file throw error
-			atom_mass = ''
-			if os.path.isfile(mfj[:mfj.rfind('\\')+1]+'\Errors.csv') == False:
-				error = open(mfj[:mfj.rfind('\\')+1]+'\Errors.csv','w')
-				error.write('Filename,Atom Label\n')
-				var = filename+','+str(i+1)+'\n'
-				error.write(var)
-				error.close()
-			else:
+	seed = random.randint(1000000, 1000000000)
+	seed = -seed #seed needs to be negative for RANLUX to initialize
+
+	#Create .mfj file
+	with open(mfj, 'w') as output_file:
+		#write file header
+		output_file.write('{}\n'.format(mfj.split('.')[0].replace('/', '\\').split('\\')[-1]))
+		output_file.write(
+			'1\n'
+			f'{atom_num}\n'
+			'ang\n'
+			f'{charge}\n'
+			f'{parameters[4]}\n'
+			f'{parameters[0]} '
+			f'{parameters[1]} '
+			f'{parameters[2]} '
+			f'{parameters[3]} '
+			f'{seed} '
+			f'{parameters[5]}\n'
+		)
+
+		#get atomic mass, and vdW paramaters from parameter files
+		for i in range(atom_num):
+			atom_mass = mass_info.get(atom_info.get(xyz_data[i][5], ''),'')
+			vwd_w = vdw_info.get(atom_info.get(xyz_data[i][5], ''), ['', '', '', ''])
+
+			#if parameter is missing, write relevant information to Errors.csv file
+			if not atom_mass:
 				try:
-					error = open(mfj[:mfj.rfind('\\')+1]+'\Errors.csv','a')
-					var = filename+','+str(i+1)+'\n'
-					error.write(var)
-					error.close()
+					write_error(mfj.split('.')[0].replace('/', '\\\\').split('\\\\')[-1], i + 1)
+					print('No mass and vdw for atom label: {} in file: {}\n'.format(i + 1, mfj.split('.')[0].replace('/', '\\').split('\\')[-1]))
+
 				except PermissionError:
-					print('Cannot write to error file, please close it!')
-			print('No mass and vdw for atom label: '+str(i+1)+' in file: '+filename+'\n')
-		try: #Get the van der Waals forces for the atom
-			vwd_w = [vdw_info[atom_info[xyz_data[i][5]]][0],vdw_info[atom_info[xyz_data[i][5]]][1],vdw_info[atom_info[xyz_data[i][5]]][2],vdw_info[atom_info[xyz_data[i][5]]][3]]
-		except (NameError,KeyError): #If the atom type cannot be determined in the vdw file throw error
-			vwd_w = ['','','','']
-		#We want to write the relevant atom data to the file being: x, y, z, atom mass, key data, vdw force 1, vdw force 2, vdw force 3, vdw force 4
-		opf.write(spacing%(xyz_data[i][2],xyz_data[i][3],xyz_data[i][4],atom_mass,key_data[i][2],vwd_w[0],vwd_w[1],vwd_w[2],vwd_w[3]))
-	opf.close()
-	
+					msg = QMessageBox()
+					msg.setWindowTitle('Permission Error')
+					msg.setText('Cannot write errors in assigning in MM2 atom types to the Errors.csv file, as it is open in another window. Please close the Errors.csv file and rerun the mfj creation module.')
+					msg.setIcon(QMessageBox.Critical)
+					msg.exec_() #show messagebox
+					return					
+
+			# write atomic number, xyz coordinates, atomic mass, and vdW parameters to .mfj file 
+			output_file.write(
+				f'{xyz_data[i][2]:>10}   {xyz_data[i][3]:>10}   {xyz_data[i][4]:>10}   '
+				f'{atom_mass:>7}   {key_data[i][2]:>10}   '
+				f'{vwd_w[0]:>5}   {vwd_w[1]:>5}   {vwd_w[2]:>5}   {vwd_w[3]:>5}\n'
+			)
+
+
+
