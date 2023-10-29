@@ -112,7 +112,7 @@ for filename in filenames:
 
     # At long last, we can write all the info to the .xyz file
     with open(orca_filename, 'a') as opf:
-        opf.write(f'{charge} {multiplicity}\n')
+        opf.write(f'*xyz {charge} {multiplicity}\n')
         opf.write(fs)
         opf.write('\n*\n\n') #terminate geom block with an asterisk, followed by two blank lines
 
