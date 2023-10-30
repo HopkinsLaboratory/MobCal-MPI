@@ -8,7 +8,7 @@ import sys
 # User-defined settings
 directory = r'C:\Users\Chris\OneDrive - University of Waterloo\Waterloo\MobCal-MPI\MobCal-MPI\Appendix_A\DFT'
 
-# No touchy past this point
+# No touchy past this point unless you know what you are doing. 
 
 thermo_properties = [
     'Filename',
@@ -44,7 +44,7 @@ def extract_property(data, pattern):
     try:
         result = float(re.findall(pattern, data)[-1].strip())
     except:
-        result = -12345.0  # Placeholder for missing values
+        result = 12345.0  # Placeholder for missing values
     return result
 
 for filename in [x for x in os.listdir(directory) if x.lower().endswith('.out')]:
@@ -64,7 +64,7 @@ for filename in [x for x in os.listdir(directory) if x.lower().endswith('.out')]
     E_ZPE = E_el + ZPE_corr
     n_imag = data.count('***imaginary mode***')
 
-    if -12345.0 in [E_el, ZPE_corr, Thermal_corr, H_corr, G_corr, E_ZPE, E_thermal, E_Enthalpy, S_tot, E_Gibbs]:
+    if 12345.0 in [E_el, ZPE_corr, Thermal_corr, H_corr, G_corr, E_ZPE, E_thermal, E_Enthalpy, S_tot, E_Gibbs]:
         print(f'{filename} is missing thermochemistry. Writing -12345 as a placeholder for missing value\n')
 
     if n_imag > 0:
