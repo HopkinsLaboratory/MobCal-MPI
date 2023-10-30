@@ -35,8 +35,8 @@ def extract_CCSDT(data, pattern):
         E_CCSDT = float(re.findall(pattern, data)[-1].strip())
     
     except Exception as e:
-        print(f'{filename} has an error: {e}. Writing -12345.0 as a placeholder for the missing value.')
-        E_CCSDT = -12345.0
+        print(f'{filename} has an error: {e}. Writing 12345.0 as a placeholder for the missing value.')
+        E_CCSDT = 12345.0
         
     return E_CCSDT
 
