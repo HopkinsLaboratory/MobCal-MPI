@@ -101,7 +101,13 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 		error_popup('critical','File Dependency Error',f'The following required Python files are missing from {required_python_files} : {missing_files_text}. Please redownload from the GitHub Repo and do not remove anything.')
 		return
 
-	print(f'If any errors are encountered, they will be written to: {directory}Errors.csv')
+	print(f'If any errors are encountered, they will be written to: {directory}Errors.csv\n')
+	print(f'To resolve the error message "No mass and vdw info for atom label XXX," please follow these steps:')
+	print(f'	1. Open the .mfj file that triggered the error in a text editor.')
+	print(f'	2. Locate the missing mass and van der Waals (vdW) information for the atom labeled as "XXX."')
+	print(f'	3. You can find the required data in the mass.prm and vdw.prm files, which are located in the /mfj_creator/Python directory.')
+	print(f'	4. Look for a similiar atom type, and fill in the missing mass and vdW values with these new ones in your .mfj file.\n')
+	
 	if os.path.isfile(os.path.join(directory, 'Errors.csv')): 
 		os.remove(os.path.join(directory, 'Errors.csv')) #remove errors.csv if it already exists
 
