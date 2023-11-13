@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 # User-defined settings
-directory = r'G:\Hopkins_Laboratory\Protonation_Induced_Chirality_v2\Verapamil_Impurity_A_z2\SR\DFT\1mer'
+directory = r'G:\Hopkins_Laboratory\Protonation_Induced_Chirality_v2\Verapamil_Impurity_A_z2\SR\DFT\0mer'
 
 # No touchy past this point
 
@@ -25,13 +25,13 @@ thermo_properties = [
     'Total Enthalpy',
     'Total Entropy',
     'Total Gibbs Energy',
-    'Relative Gibbs Energy'
+    'Relative Gibbs Energy',
 ]
 
 # Format the header for consistent spacing 
-header = '{}\n'.format(','.join(['{:<25}'] * len(thermo_properties)))
+header = '{},\n'.format(','.join(['{:<25}'] * len(thermo_properties)))
 
-#Create output file and write header to it
+# Create output file and write header to it
 output_csv = os.path.join(directory, 'Thermo_data.csv')
 
 try:
@@ -68,6 +68,7 @@ for filename in [x for x in os.listdir(directory) if x.lower().endswith('.out')]
     E_Gibbs = extract_property(data, 'Final Gibbs free energy         ...(.*?)Eh')
     E_ZPE = E_el + ZPE_corr
     n_imag = data.count('***imaginary mode***')
+    Erel = 123.0
 
     Gibbs_list.append(E_Gibbs)
 
@@ -78,15 +79,14 @@ for filename in [x for x in os.listdir(directory) if x.lower().endswith('.out')]
         print(f'{filename} contains {n_imag} imaginary frequencies.')
 
     # Prepare the values to be written
-    values = [filename, n_imag, E_el, ZPE_corr, Thermal_corr, H_corr, G_corr, E_ZPE, E_thermal, E_Enthalpy, S_tot, E_Gibbs]
+    values = [filename, n_imag, E_el, ZPE_corr, Thermal_corr, H_corr, G_corr, E_ZPE, E_thermal, E_Enthalpy, S_tot, E_Gibbs, Erel]
 
     # Create a format string for consistent spacing
-    format_str = '{}'.format('{:<25},' * (len(values) - 1) + '{:<25}\n')
+    format_str = '{}'.format(','.join(['{:<25}'] * len(values)) + ',\n')
 
     # Append the extracted properties to the CSV file
     with open(output_csv, 'a') as opf:
         opf.write(format_str.format(*values))
-
 
 # Calculate the minimum Gibbs energy
 min_Gibbs = np.min(Gibbs_list)
@@ -94,19 +94,16 @@ min_Gibbs = np.min(Gibbs_list)
 # Read the CSV into a pandas DataFrame
 df = pd.read_csv(output_csv)
 
-# Check for the correct column name in the DataFrame
-gibbs_column = next((col for col in df.columns if 'Total Gibbs Energy' in col), None)
+# Calculate relative energy column and update it in the DataFrame
+df['Relative Gibbs Energy    '] = (df['Total Gibbs Energy       '] - min_Gibbs) * 2625.5
 
-if gibbs_column is not None:
-    # Calculate relative energy column and add it to the DataFrame
-    df['Relative Gibbs Energy'] = (df[gibbs_column] - np.min(Gibbs_list)) * 2625.5
+print(df['Relative Gibbs Energy    '])
+# Write the updated DataFrame back to the CSV with consistent spacing
+with open(output_csv, 'w') as opf:
+    opf.write(header.format(*thermo_properties))  # Write the header first
 
-    # Write the updated DataFrame back to the CSV
-    df.to_csv(output_csv, index=False)
-    print('Done')
-else:
-    print('Column "Total Gibbs Energy" not found in DataFrame.')
-    df['Relative Gibbs Energy'] = 12345.0
+    for index, row in df.iterrows():
+        values = list(row)
+        opf.write(format_str.format(*values))
 
-
-
+print('Done')
