@@ -4,11 +4,13 @@
 import os
 import re
 import sys
+import numpy as np
+import pandas as pd
 
 # User-defined settings
-directory = r'C:\Users\Chris\OneDrive - University of Waterloo\Waterloo\MobCal-MPI\MobCal-MPI\Appendix_A\DFT'
+directory = r'G:\Hopkins_Laboratory\Protonation_Induced_Chirality_v2\Verapamil_Impurity_A_z2\SR\DFT\1mer'
 
-# No touchy past this point unless you know what you are doing. 
+# No touchy past this point
 
 thermo_properties = [
     'Filename',
@@ -22,7 +24,8 @@ thermo_properties = [
     'Total Thermal Energy',
     'Total Enthalpy',
     'Total Entropy',
-    'Total Gibbs Energy'
+    'Total Gibbs Energy',
+    'Relative Gibbs Energy'
 ]
 
 # Format the header for consistent spacing 
@@ -47,6 +50,8 @@ def extract_property(data, pattern):
         result = 12345.0  # Placeholder for missing values
     return result
 
+Gibbs_list = []
+
 for filename in [x for x in os.listdir(directory) if x.lower().endswith('.out')]:
     with open(os.path.join(directory, filename), 'r') as opf:
         data = opf.read()
@@ -64,11 +69,13 @@ for filename in [x for x in os.listdir(directory) if x.lower().endswith('.out')]
     E_ZPE = E_el + ZPE_corr
     n_imag = data.count('***imaginary mode***')
 
+    Gibbs_list.append(E_Gibbs)
+
     if 12345.0 in [E_el, ZPE_corr, Thermal_corr, H_corr, G_corr, E_ZPE, E_thermal, E_Enthalpy, S_tot, E_Gibbs]:
-        print(f'{filename} is missing thermochemistry. Writing -12345 as a placeholder for missing value\n')
+        print(f'{filename} is missing thermochemistry. Writing 12345 as a placeholder for missing value')
 
     if n_imag > 0:
-        print(f'{filename} contains {n_imag} imaginary frequencies.\n')
+        print(f'{filename} contains {n_imag} imaginary frequencies.')
 
     # Prepare the values to be written
     values = [filename, n_imag, E_el, ZPE_corr, Thermal_corr, H_corr, G_corr, E_ZPE, E_thermal, E_Enthalpy, S_tot, E_Gibbs]
@@ -80,4 +87,26 @@ for filename in [x for x in os.listdir(directory) if x.lower().endswith('.out')]
     with open(output_csv, 'a') as opf:
         opf.write(format_str.format(*values))
 
-print('Done')
+
+# Calculate the minimum Gibbs energy
+min_Gibbs = np.min(Gibbs_list)
+
+# Read the CSV into a pandas DataFrame
+df = pd.read_csv(output_csv)
+
+# Check for the correct column name in the DataFrame
+gibbs_column = next((col for col in df.columns if 'Total Gibbs Energy' in col), None)
+
+if gibbs_column is not None:
+    # Calculate relative energy column and add it to the DataFrame
+    df['Relative Gibbs Energy'] = (df[gibbs_column] - np.min(Gibbs_list)) * 2625.5
+
+    # Write the updated DataFrame back to the CSV
+    df.to_csv(output_csv, index=False)
+    print('Done')
+else:
+    print('Column "Total Gibbs Energy" not found in DataFrame.')
+    df['Relative Gibbs Energy'] = 12345.0
+
+
+
