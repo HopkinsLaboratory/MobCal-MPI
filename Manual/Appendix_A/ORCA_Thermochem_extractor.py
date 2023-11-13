@@ -97,7 +97,6 @@ df = pd.read_csv(output_csv)
 # Calculate relative energy column and update it in the DataFrame
 df['Relative Gibbs Energy    '] = (df['Total Gibbs Energy       '] - min_Gibbs) * 2625.5
 
-print(df['Relative Gibbs Energy    '])
 # Write the updated DataFrame back to the CSV with consistent spacing
 with open(output_csv, 'w') as opf:
     opf.write(header.format(*thermo_properties))  # Write the header first
