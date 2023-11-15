@@ -213,7 +213,7 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 	#Convert .sdf files to MobCal-MPI inputs
 	sdf_files = [x for x in os.listdir(babel_o[:-5]) if x.endswith('.sdf')]
 
-	for file in sdf_files:
+	for file_num,file in enumerate(sdf_files):
 		with open(os.path.join(babel_o[:-5], file), 'r') as opf:
 			data = opf.readlines()
 
