@@ -161,11 +161,10 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 				data_XYZ = opf.read()
 				data_ESP = data_XYZ.replace('\n', 'ggez')
 
-			#Extract ESP charges and append to ESP list
+			#Extract ESP charges and append to ESP list (ESP data was not being extracted properly in previous version of main.py. Data was being processed on the native data_ESP variable, not ESP_charges. Sorry users!)
 			try:
 				ESP_charges = re.findall(r'CHELPG Charges(.*?)Total charge:', data_ESP)[-1]
-				ESP_charges = data_ESP.split('ggez')
-				ESP_charges = [x.split()[-1] for x in data_ESP if ':' in x]
+				ESP_charges = [x.split()[-1] for x in ESP_charges.split('ggez') if ':' in x]
 				ESP.append(ESP_charges)
 			except:
 				error_popup('critical','ESP Charge Error',f'{file} is missing ESP data, did it finish correctly?\nGUI will now exit.')
@@ -241,6 +240,27 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 
 		time.sleep(0.4) # short delay because sdf2tinkerxyz conversion is not instantaneous. 
 
+		#Update data in the .key file with the ESP data that we extracted earlier (code was accidentally deleted between 2.0.1 and 2.0.2 ... sorry users!)
+		with open(babel_o[:-5]+data[0][:-1]+'.key','r') as key:
+			key_data = key.readlines()
+		try:
+			key_filename = f'{babel_o[:-5]}{data[0][:-1]}.key'
+			
+			with open(key_filename, 'w') as key:
+				for index, line in enumerate(key_data): # Iterate through the lines in key_data
+					if line.split()[0] == 'charge': 
+						# If the line starts with charge, update the third element with ESP data
+						line_parts = line.split()
+						line_parts[2] = ESP[file_num][index]
+						key.write('%s %s %s\n' % (line_parts[0], line_parts[1], line_parts[2]))
+					
+					else:
+						key.write(line) # If the line does not start with charge, write the line as it is
+			
+		except PermissionError:
+			error_popup('critical','sdf2tinkerxyz Error',f'Cannot access: {data[0][:-1]}.key. Please restart the program.')
+			return
+			
 		key_file = os.path.join(babel_o[:-5], data[0][:-1] + '.key')
 		xyz_file = os.path.join(babel_o[:-5], data[0][:-1] + '.xyz')
 		mfj_file = os.path.join(babel_o[:-5], data[0][:-1] + '.mfj')
