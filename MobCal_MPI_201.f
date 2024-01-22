@@ -2252,7 +2252,7 @@ c         write(1000+imyrank,676) pgst(ig),mpitemp1,mpitemp2,mpitemp3
 c       endif
 c
 c collect values of all cores into 2D array only for node 0
-        if(myrank.eq.0)then
+        if(imyrank.eq.0)then
          q12D(ig,ic)=mpitemp1
          q22D(ig,ic)=mpitemp2
          q32D(ig,ic)=mpitemp3
