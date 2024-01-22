@@ -34,7 +34,7 @@ def submit_file(File,options):
     opf.write('# JOB START (loading modules)' + '\n')
     opf.write('module load GCC/11.2.0 OpenMPI/4.1.1' + '\n')
     opf.write('\n')
-    opf.write(f'srun --cpu_bind=cores --distribution=block:cyclic ./MobCal_MPI_201.exe {run_file}' + '\n')
+    opf.write(f'srun --cpu_bind=cores --distribution=block:cyclic ./MobCal_MPI_202.exe {run_file}' + '\n')
     ## close slurm file
     opf.close()
     ## submit

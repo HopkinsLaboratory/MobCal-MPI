@@ -1,4 +1,4 @@
-# MobCal-MPI 2.0.1
+# MobCal-MPI 2.0.2
 
 MobCal-MPI is a parallelized version of the widely-used MobCal suite, designed for calculating ion mobilities and collision cross sections (2.0).
 

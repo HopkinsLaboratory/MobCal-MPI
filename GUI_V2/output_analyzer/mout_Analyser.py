@@ -5,25 +5,29 @@ from math import factorial
 from scipy.optimize import curve_fit
 from scipy.stats import gaussian_kde
 from scipy.interpolate import interp1d
-import matplotlib.pyplot as plt
+
 import matplotlib
-from PyQt5.QtWidgets import QMessageBox
+matplotlib.use('QtAgg') #Use matplotlib backend that is compatible w/ PyQt6 to prevent competition w/ GUI event loop
+import matplotlib.pyplot as plt
+
+from PyQt6.QtWidgets import QMessageBox
 
 matplotlib.rcParams.update({'font.size': 12})
 matplotlib.rcParams.update({'lines.linewidth': 1.5})
 
+#because of class within a class layout, its easier to call the error popup function externally rather than nest it within each new class defined in this file
 def error_popup(urgency, type, message):
-	'''Sends a popup tot the GUI if proc'd. Usage is urgency level, error title, and message text'''
+	'''Sends a popup to the GUI if proc'd. Usage is urgency level, error title, and message text'''
 	msg = QMessageBox()
 	msg.setWindowTitle(type)
 	msg.setText(message)
 
-	if urgency == 'warning' or 'Warning':
-		msg.setIcon(QMessageBox.Warning)
+	if urgency == 'warning' or urgency == 'Warning':
+		msg.setIcon(QMessageBox.Icon.Warning)
 	else:
-		msg.setIcon(QMessageBox.Critical)
+		msg.setIcon(QMessageBox.Icon.Critical)
 
-	msg.exec_()
+	msg.exec()
 
 class mout_info:
 	'''class with all info and functions from mout files'''
@@ -35,7 +39,7 @@ class mout_info:
 			data = opf.read()
 			opf.close()
 		except: #check if mout file exists
-			error_popup('critical','File Error',f'Could not find the file {file} - does it exist in the directory specified and/or did it finish correctly?')
+			error_popup('critical','File Error',f'Could not find the file {file}\n Does it exist in the directory specified and/or did it finish correctly?')
 			return 
 
 
@@ -51,7 +55,7 @@ class mout_info:
 		self.piro2 = np.pi*(self.ro)**2 # Q = piro2 * Qst
 		self.Tfac = kB/(self.eo*elC) # Tst = Tfac * T
 		
-		coll_mass = {"He": 4.0026, "N2": 28.0062}
+		coll_mass = {'He': 4.0026, 'N2': 28.0062}
 		
 		self.direc = directory
 		self.filename = re.findall('input file name = (.*?)\n',data)[0].strip()[:-4]
@@ -220,7 +224,7 @@ class mout_info:
 			plt.xlabel(r'$E/N$ [Td]')
 			plt.ylabel(r'$K_0$ [cm$^2$/Vs]')
 			plt.tight_layout()
-			plt.show()
+			plt.show(block=False)
 		
 		return popt
 	
@@ -296,7 +300,7 @@ class mout_info:
 		plt.xlabel(r'$T_{eff}$ [K]')
 		plt.ylabel(r'CCS [$\AA^2$]')
 		plt.tight_layout()
-		plt.show()
+		plt.show(block=False)
 	
 	def plot_CCS_integrand(self):
 		'''Plotting CCS integrand over the velocity range'''
@@ -314,7 +318,7 @@ class mout_info:
 		plt.legend()
 		plt.yticks([])
 		plt.tight_layout()
-		plt.show()
+		plt.show(block=False)
 	
 	def plot_Qldat(self,lmax=3):
 		'''Plots momentum transfer integrals Q^(l) up to lmax = 1,2 or 3.'''
@@ -328,7 +332,7 @@ class mout_info:
 		plt.legend()
 		plt.grid(which='both',lw=0.3)
 		plt.tight_layout()
-		plt.show()
+		plt.show(block=False)
 
 class many_mout:
 	def __init__(self,direc):
@@ -396,7 +400,7 @@ class many_mout:
 		xticks_pos = [0.65*patch.get_width() + patch.get_xy()[0] for patch in h]
 		_ = plt.xticks(xticks_pos, labels, ha='right', rotation=45)
 		plt.ylabel(r'CCS / $\AA^2$')
-		plt.show()
+		plt.show(block=False)
 	
 	def plot_CCS_dist(self):
 		'''plots the distribution (histogram) of all low field CCSs of M_list'''
@@ -412,7 +416,7 @@ class many_mout:
 		plt.xlabel(r'CCS / $\AA^2$')
 		plt.ylabel('frequency')
 		plt.legend(loc='upper right')
-		plt.show()
+		plt.show(block=False)
 	
 	def export_CCS(self, itype=0):
 		if self.common_Tbath:
@@ -482,7 +486,7 @@ class many_mout:
 				fo.write(Tgrid_info)
 
 				# files in columns
-				fo.write('Teff(K) \ CCS(A^2) of' + ', %s' * self.Nfiles % (*self.files,) + '\n')
+				fo.write(r'Teff(K) \ CCS(A^2) of' + ', %s' * self.Nfiles % (*self.files,) + '\n')
 				for i in range(Ngrid):
 					# Convert the list of strings to a comma-separated string with empty entries
 					ccs_str = ', '.join(['%7.2f' %ccs if ccs != '' else ' ' for ccs in CCSs[:, i]]) 
@@ -550,7 +554,7 @@ class many_mout:
 				fo.write(Tinfo)
 
 				# files in columns
-				fo.write('E/N(Td) \ K0(cm^2/Vs) of' + ', %s' * self.Nfiles % (*self.files,) + '\n')
+				fo.write(r'E/N(Td) \ K0(cm^2/Vs) of' + ', %s' * self.Nfiles % (*self.files,) + '\n')
 				for i in range(Ngrid):
 					# Convert the list of strings to a comma-separated string with empty entries
 					#k0_str = ', '.join([str(k0) if k0 != '' else ' ' for k0 in K0s[:, i]]) #old

@@ -4,9 +4,9 @@ import subprocess
 import time
 from shutil import copyfile
 from mfj_creator.Python.xyz_to_mfj import *
-from PyQt5.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QMessageBox
 
-def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
+def run(self, directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 	start_time = time.time()
 
 	def get_files(file):
@@ -16,19 +16,6 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 		#about 1.5 seconds per file, printed out in converted to minutes
 		return round((number_of_files * 1.5) / (60), 2)
 	
-	def error_popup(urgency, type, message):
-		'''Sends a popup tot the GUI if proc'd. Usage is urgency level, error title, and message text'''
-		msg = QMessageBox()
-		msg.setWindowTitle(type)
-		msg.setText(message)
-
-		if urgency == 'warning' or 'Warning':
-			msg.setIcon(QMessageBox.Warning)
-		else:
-			msg.setIcon(QMessageBox.Critical)
-
-		msg.exec_()
-
 	logs = []
 
 	if csv != '':
@@ -53,10 +40,10 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 	orca_logs = any(log.lower().endswith('.out') for log in logs)
 
 	if gaussian_logs and orca_logs:
-		error_popup('critical','File Error','Gaussian files (.log) and ORCA files (.out) are both present in the specified directory. Please put the Gaussian and ORCA files into separate directories and re-run the mfj creator.')
+		self.error_popup('critical','File Error','Gaussian files (.log) and ORCA files (.out) are both present in the specified directory. Please put the Gaussian and ORCA files into separate directories and re-run the mfj creator.')
 		return
 	elif not gaussian_logs and not orca_logs:
-		error_popup('critical','File Error','There are no Gaussian files (.log) or ORCA files (.out) in the specified directory')
+		self.error_popup('critical','File Error','There are no Gaussian files (.log) or ORCA files (.out) in the specified directory')
 		return
 
 	# Copy files to a new directory to avoid changing the originals
@@ -75,7 +62,7 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 		openbabel_version = version_lines[0].split()[2].strip() if version_lines[0].startswith('Open Babel') else None
 
 		if openbabel_version not in ['2.4.1', '2.3.90']: #2.3.90 is an exception because the ORCA version of Avogadro preinstalls this versino of babel.  
-			error_popup('critical','OpenBabel Error',f'Open Babel version: {openbabel_version} was found on your PC. Please uninstall it, and install v2.4.1 as recommended in the manual.')
+			self.error_popup('critical','OpenBabel Error',f'Open Babel version: {openbabel_version} was found on your PC. Please uninstall it, and install v2.4.1 as recommended in the manual.')
 			return
 		
 	except subprocess.CalledProcessError as e:
@@ -83,7 +70,7 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 		return
 
 	except FileNotFoundError:
-		error_popup('critical','OpenBabel Error','Open Babel could not be found on your PC. Please install v2.4.1 as stated in the manual and ensure the babel.exe is available in your system\'s PATH')
+		self.error_popup('critical','OpenBabel Error','Open Babel could not be found on your PC. Please install v2.4.1 as stated in the manual and ensure the babel.exe is available in your system\'s PATH')
 		return
 
 	#check for missing python files
@@ -98,7 +85,7 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 
 	if missing_files: #checks if list is populated. If populated, will return true. If empty, will return false. 
 		missing_files_text = ', '.join(missing_files)
-		error_popup('critical','File Dependency Error',f'The following required Python files are missing from {required_python_files} : {missing_files_text}. Please redownload from the GitHub Repo and do not remove anything.')
+		self.error_popup('critical','File Dependency Error',f'The following required Python files are missing from {required_python_files} : {missing_files_text}. Please redownload from the GitHub Repo and do not remove anything.')
 		return
 
 	print(f'If any errors are encountered, they will be written to: {directory}Errors.csv\n')
@@ -128,7 +115,7 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 				data = [x.split()[2] for x in data if len(x.split()) == 3]
 				ESP.append(data)
 			except:
-				error_popup('critical','ESP Charge Error',f'{file} is missing ESP data, did it finish correctly?\nGUI will now exit.')
+				self.error_popup('critical','ESP Charge Error',f'{file} is missing ESP data, did it finish correctly?\nGUI will now exit.')
 				return
 
 		print('ESP succesfully extracted from Gaussian logs.\n')
@@ -145,7 +132,7 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 				print(f'Subproccess call to OpenBabel failed. Attempting to execute {command} via os.system')
 				os.system(command) #alternative to subproccess call in case it fails.		
 			except:
-				error_popup('critical','OpenBabel Conversion Error','Encountered an error using Babel to convert the Gaussian .log files to .sdf files. Is Babel installed?')
+				self.error_popup('critical','OpenBabel Conversion Error','Encountered an error using Babel to convert the Gaussian .log files to .sdf files. Is Babel installed?')
 				return
 
 		print('Gaussian .log files were successfully converted to .sdf\n')
@@ -167,7 +154,7 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 				ESP_charges = [x.split()[-1] for x in ESP_charges.split('ggez') if ':' in x]
 				ESP.append(ESP_charges)
 			except:
-				error_popup('critical','ESP Charge Error',f'{file} is missing ESP data, did it finish correctly?\nGUI will now exit.')
+				self.error_popup('critical','ESP Charge Error',f'{file} is missing ESP data, did it finish correctly?\nGUI will now exit.')
 				return
 
 			# Create a .xyz file from ORCA .out files
@@ -204,7 +191,7 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 				print(f'Subproccess call to OpenBabel failed. Attempting to execute {command} via os.system')
 				os.system(command) #alternative to subproccess call in case it fails.		
 			except:
-				error_popup('critical','OpenBabel Conversion Error','Encountered an error using Babel to convert the ORCA .out files to .sdf files. Is Babel installed?')
+				self.error_popup('critical','OpenBabel Conversion Error','Encountered an error using Babel to convert the ORCA .out files to .sdf files. Is Babel installed?')
 				return
 
 		# Delete .xyz and .out files after conversion to .sdf
@@ -235,7 +222,7 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 				os.system(command) #alternative to subproccess call in case it fails.
 
 			except:
-				error_popup('critical','sdf2tinkerxyz Error','Encountered an error using sdf2tinkerxyz.exe. Please check that the sdf2xyz2sdf directory dialog box entry contains the sdf2tinkerxyz.exe is installed there and that the sdf2xyz2sdf directory is added to your system\'s PATH (see manual).')
+				self.error_popup('critical','sdf2tinkerxyz Error','Encountered an error using sdf2tinkerxyz.exe. Please check that the sdf2xyz2sdf directory dialog box entry contains the sdf2tinkerxyz.exe is installed there and that the sdf2xyz2sdf directory is added to your system\'s PATH (see manual).')
 				return
 
 		time.sleep(0.4) # short delay because sdf2tinkerxyz conversion is not instantaneous. 
@@ -258,14 +245,14 @@ def run(directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 						key.write(line) # If the line does not start with charge, write the line as it is
 			
 		except PermissionError:
-			error_popup('critical','sdf2tinkerxyz Error',f'Cannot access: {data[0][:-1]}.key. Please restart the program.')
+			self.error_popup('critical','sdf2tinkerxyz Error',f'Cannot access: {data[0][:-1]}.key. Please restart the program.')
 			return
 			
 		key_file = os.path.join(babel_o[:-5], data[0][:-1] + '.key')
 		xyz_file = os.path.join(babel_o[:-5], data[0][:-1] + '.xyz')
 		mfj_file = os.path.join(babel_o[:-5], data[0][:-1] + '.mfj')
 
-		xyz_to_mfj(os.getcwd() + '\\mfj_creator\\Python\\', xyz_file, key_file, mfj_file, charge, parameters)
+		xyz_to_mfj(self, os.getcwd() + '\\mfj_creator\\Python\\', xyz_file, key_file, mfj_file, charge, parameters)
 
 		#After .mfj file is created, remove the .sdf file, .key file, and tinker xyz file as they are no longer useful. 
 		os.remove(os.path.join(babel_o[:-5], file))

@@ -1,8 +1,8 @@
 import os
 import random
-from PyQt5.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QMessageBox
 
-def xyz_to_mfj(directory, xyz, key, mfj, charge, parameters):
+def xyz_to_mfj(self, directory, xyz, key, mfj, charge, parameters):
 	
 	def write_error(filename, atom_number):
 		error_file_path = os.path.join(mfj[:mfj.rfind('\\')+1], 'Errors.csv')
@@ -77,12 +77,8 @@ def xyz_to_mfj(directory, xyz, key, mfj, charge, parameters):
 					print('No mass and vdw for atom label: {} in file: {}\n'.format(i + 1, mfj.split('.')[0].replace('/', '\\').split('\\')[-1]))
 
 				except PermissionError:
-					msg = QMessageBox()
-					msg.setWindowTitle('Permission Error')
-					msg.setText('Cannot write errors in assigning in MM2 atom types to the Errors.csv file, as it is open in another window. Please close the Errors.csv file and rerun the mfj creation module.')
-					msg.setIcon(QMessageBox.Critical)
-					msg.exec_() #show messagebox
-					return					
+					self.error_popup('critical','sdf2tinkerxyz Error',f'Cannot write errors in assigning in MM2 atom types to the Errors.csv file, as it is open in another window. Please close the Errors.csv file and rerun the mfj creation module.')
+					return			
 
 			# write atomic number, xyz coordinates, atomic mass, and vdW parameters to .mfj file 
 			output_file.write(

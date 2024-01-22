@@ -36,7 +36,7 @@ def submit_file(File,options):
     opf.write('\n')
     opf.write('export I_MPI_PMI_LIBRARY=/usr/lib64/libpmi.so' + '\n')
     opf.write('\n')
-    opf.write(f'srun --mpi=pmi2 ./MobCal_MPI_201.exe {run_file}' + '\n')
+    opf.write(f'srun --mpi=pmi2 ./MobCal_MPI_202.exe {run_file}' + '\n')
     ## close slurm file
     opf.close()
     ## submit
