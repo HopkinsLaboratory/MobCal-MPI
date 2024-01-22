@@ -156,7 +156,6 @@ def check_git():
     
     else:
         #If GitHub is found, add it to the system's PATH
-        print(f'Git path:{git_path}')
         add_to_path(git_path)
 
 #Now with those functions set up, we can check for the required python modules 
