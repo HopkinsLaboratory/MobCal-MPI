@@ -6,6 +6,12 @@ MobCal-MPI is a parallelized version of the widely-used MobCal suite, designed f
 
 Detailed compilation instructions on high-performance computing (HPC) and standalone Unix platforms are provided in the [MobCal-MPI 2.0.1 manual](/Manual/MobCal-MPI_User_manual.pdf). For the convenience of users who do not have access to HPC architecture, we have also provided a [Quick Guide](/Manual/Quick%20Guide%20for%20installing%20Intel%20OneAPI%20to%20compile%20Fortran%20code.pdf) for installing Intel OneAPI and the associate mpiifort compiler to local Unix systems.
 
+## Changes in v2.0.2
+- Fixed a bug in the Fortran source code impacting compilation via OneAPI. 
+- Added update funtionality to the MobCal-MPI GUI, informing users of when updates are pushed to GitHub.
+- Fixed minor bugs within the GUI.
+- Updated Sections 3.1, 3.2, and 3.3 of the MobCal-MPI manual to describe the above changes.
+
 ## Changes in v2.0.1
 The latest release, v2.0.1, builds upon its predecessor by incorporating two-temperature theory (2TT) to accurately compute ion mobilities and CCSs at arbitrary field strengths. It addresses fixes to the GUI and some compilation errors. The release also includes a detailed manual covering the GUI's functionality, compiling the MobCal-MPI Fortran code on various Unix platforms, and an Appendix providing a step-by-step tutorial on calculating an ion's CCS from scratch.
 
