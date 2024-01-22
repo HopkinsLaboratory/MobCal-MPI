@@ -368,7 +368,7 @@ class AppWindow(QtWidgets.QMainWindow):
         root = os.getcwd()
 
         #URL of the MobCal-MPI repo
-        repo_url = 'https://github.com/ChristianIeritano/MobCal-MPI-UpdateTesting'
+        repo_url = 'https://github.com/HopkinsLaboratory/MobCal-MPI'
 
         #get SHA value of repo-ID
         repo_SHA = get_latest_commit_sha(repo_url)
