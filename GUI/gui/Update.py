@@ -63,8 +63,6 @@ def Update_GUI_files(repo_url, root, ID_file, repo_SHA, delete_dir_function):
             
             # Write the logic to update each file
             for local_path, github_path in update_files.items():
-                #local_full_path = os.path.join(root, f'{local_path}')
-                #github_full_path = os.path.join(temp_dir, 'GUI_V2', f'{github_path}')
                 opf.write(f'if os.path.isfile(r"{local_path}"): os.remove(r"{local_path}")\n')
                 opf.write(f'shutil.move(r"{github_path}", r"{os.path.dirname(local_path)}")\n')
             opf.write('sys.exit(0)')
@@ -93,12 +91,10 @@ def Update_GUI_files(repo_url, root, ID_file, repo_SHA, delete_dir_function):
     #Update process for Linux users
     else:
         for local_path, github_path in update_files.items():
-            local_full_path = os.path.join(root, f'{local_path}')
-            github_full_path = os.path.join(temp_dir, 'GUI_V2', f'{github_path}')
-
             # Similar to Windows, but using direct Python commands instead of writing to a script
-            if local_full_path.exists(): local_full_path.unlink()
-            shutil.move(str(github_full_path), str(local_full_path))
+            if os.path.isfile(local_path):
+                os.remove(local_path)
+            shutil.move(github_path, os.path.dirname(local_path))
 
         #Update the ID file
         with open(ID_file, 'w') as opf:
