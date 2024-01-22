@@ -192,9 +192,6 @@ from PyQt6 import QtCore
 from PyQt6 import QtGui
 from PyQt6.QtWidgets import QMessageBox
 
-#import numpy as np 
-#import scipy, matplotlib, git
-
 import git
 import numpy as np
 from math import factorial
