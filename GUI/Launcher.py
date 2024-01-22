@@ -42,7 +42,9 @@ def find_github_desktop():
                     return str(git_exe.parent)
         except FileNotFoundError:
             pass
-        
+        except OSError:
+            pass
+
         #If unsucessful, try some other default locations.  
         paths_to_check.extend([
             Path(os.environ.get('LOCALAPPDATA', '')) / 'GitHubDesktop',
@@ -74,21 +76,88 @@ def find_github_desktop():
     
     return None
 
-def add_to_path(new_path):
-    '''Takes a path as input and adds it to the system's PATH environment variable'''
-    os.environ['PATH'] = new_path + ';' + os.environ['PATH']
-
-def check_github_desktop():
-    '''Checks if GitHub Desktop is installed on the Users PC and adds it to PATH, and if it isn't, promts them to instal it before continuing'''
+def find_git_executable():
+    os_type = platform.system()
     
+    if os_type == 'Windows':
+        # Try to find the Git path in the registry
+        try:
+            import winreg
+            # Check both HKEY_LOCAL_MACHINE and HKEY_CURRENT_USER
+            for hkey in [winreg.HKEY_LOCAL_MACHINE, winreg.HKEY_CURRENT_USER]:
+                with winreg.OpenKey(hkey, r'Software\GitForWindows') as key:
+                    path, _ = winreg.QueryValueEx(key, 'InstallPath')
+                    git_exe = Path(path) / 'bin' / 'git.exe'
+                    if git_exe.exists():
+                        return str(git_exe)
+        except FileNotFoundError:
+            pass
+        except OSError:
+            pass
+
+    # For macOS and Linux, as well as a failsafe for Windows
+    git_path = shutil.which('git')
+    if git_path is not None:
+        return git_path
+
+    # Common paths to check for Git on Unix-like systems
+    unix_paths = [
+        '/usr/local/bin/git',  # Common for macOS and some Linux distros
+        '/opt/local/bin/git',  # Common for installations via MacPorts
+        '/usr/bin/git',        # Common for Linux distros
+        '/bin/git',            # Less common, but worth checking
+        # more can be added as needed
+    ]
+
+    for path in unix_paths:
+        if Path(path).is_file():
+            return path
+
+    # If Git executable not found, idk you probably didn't install it
+    return None
+    
+def add_to_path(new_path):
+    '''Takes a path as input and adds it to the system's PATH environment variable if it isn't already there'''
+    os_type = platform.system()
+
+    # Windows uses semicolons (;) as path separator
+    if os_type == 'Windows':
+        path_separator = ';'
+    else:
+        # Both macOS (Darwin) and Linux use colons (:) as path separator
+        path_separator = ':'
+
+    # Check if new_path is already in PATH
+    if new_path not in os.environ['PATH'].split(path_separator):
+        os.environ['PATH'] = new_path + path_separator + os.environ['PATH']
+
+def check_git():
+    '''Checks if GitHub Desktop and Git are installed on the Users PC and adds it to PATH, and if it isn't, promts them to instal it before continuing'''
+    
+    #Check for GitHub Desktop
     git_desktop_path = find_github_desktop()
+
     if not git_desktop_path:
-        print('GitHub Desktop not detected. Please install from the following URL:')
+        print('GitHub Desktop is not installed. Please install from the following URL to the default directory:')
         print('https://desktop.github.com/')
         sys.exit(0)
+    
     else:
         #If GitHub desktop is found, add it to the system's PATH
         add_to_path(git_desktop_path)
+
+    #Check for Git
+    git_path = find_git_executable()
+
+    if not git_path:
+        print('Git is not installed. Please install from the following URL to the default directory:')
+        print('https://git-scm.com/')
+        sys.exit(0)
+    
+    else:
+        #If GitHub is found, add it to the system's PATH
+        print(f'Git path:{git_path}')
+        add_to_path(git_path)
 
 #Now with those functions set up, we can check for the required python modules 
 
@@ -111,7 +180,7 @@ def offer_package_install(package):
 
 if __name__ == '__main__':
     #Check that github desktop is installed
-    check_github_desktop()
+    check_git()
 
     #check that all required python modules are installed
     required_packages = ['PyQt6', 'numpy', 'scipy', 'matplotlib', 'git']
