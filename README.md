@@ -2,9 +2,24 @@
 
 MobCal-MPI is a parallelized version of the widely-used MobCal suite, designed for calculating ion mobilities and collision cross sections (2.0).
 
-## Compilation Instructions
+## Fortran code Compilation Instructions
 
 Detailed compilation instructions on high-performance computing (HPC) and standalone Unix platforms are provided in the [MobCal-MPI 2.0.1 manual](/Manual/MobCal-MPI_User_manual.pdf). For the convenience of users who do not have access to HPC architecture, we have also provided a [Quick Guide](/Manual/Quick%20Guide%20for%20installing%20Intel%20OneAPI%20to%20compile%20Fortran%20code.pdf) for installing Intel OneAPI and the associate mpiifort compiler to local Unix systems.
+
+## GUI 
+A [GUI](/GUI/Launcher.py) is provided to streamline the creation and analysis of MobCal-MPI files. Detailed documentation is provided in the [manual](/Manual/MobCal-MPI_User_manual.pdf), although for users who desire a QuickStart workflow, the GUI requires the following prerequisites to load:
+
+- **Python 3.12+**: Download and install from [Python Downloads](https://www.python.org/downloads/).
+- **GitHub Desktop**: Download from [GitHub Desktop](https://desktop.github.com/). A GitHub account is not required for installation.
+- **Git**: Download from [Git SCM](https://git-scm.com/). Please install in the default location and add it to PATH if necessary. A GitHub account is not required for installation.
+- **OpenBabel 2.4.1**: Download and install from [sourceforge](https://sourceforge.net/projects/openbabel/files/openbabel/2.4.1/)
+- **SDF2XYZ2SDF**: Download and install from [sourceforge](https://sourceforge.net/projects/sdf2xyz2sdf/files/binaries/windows/)
+
+The GUI also requires several Python packages. Install them using the following command in your command prompt:
+
+```console
+pip install numpy pyqt6 scipy matplotlib gitpython
+```
 
 ## Changes in v2.0.2
 - Fixed a bug in the Fortran source code impacting compilation via OneAPI. 
