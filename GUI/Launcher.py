@@ -227,6 +227,8 @@ def get_latest_commit_sha(repo_url, branch='HEAD'):
 def delete_dir(directory):
     '''Windows has special permissions on read-only folders - here's a function that deals with it using shutil.rmtree'''
 
+    os_type = platform.system()
+
     def handleRemoveReadonly(func, path, exc_info):
         '''A function to deal with the error encourntered when trying to delete a file using shutil.rmtree that is read-only in Windows.'''
         
@@ -235,14 +237,29 @@ def delete_dir(directory):
         os.unlink(path)
 
     try:
-        shutil.rmtree(directory, onexc=handleRemoveReadonly)
+        if os_type == 'Windows':
+            shutil.rmtree(directory, onexc=handleRemoveReadonly)
+        
+        #no special read/write perms needed to delete read only folders on Mac/Linux platforms
+        else:
+            shutil.rmtree(directory)
     
+    #If using Python versions <3.9, syntax for encountering errors when deleting directories is different.
+    except TypeError:
+
+        try:
+            shutil.rmtree(directory, onerror=handleRemoveReadonly) 
+
+        except:
+            print(f'Encountered error when attempting to delete {directory}. This is probably because your python version is <3.9. Please update to Python 3.12+ to rectify this - you can also manually delete the temp folder after the GUI loads. ')
+            pass
+
     except PermissionError:
-        print(f'Encountered permission error when attempting to delete {directory}. This is probably caused by a OneDrive sync issue - you can manually delete the temp folder after the GUI loads. ')
+        print(f'Encountered permission error when attempting to delete {directory}. This is probably caused by a OneDrive sync issue - you can manually delete the GUI/temp folder after the GUI loads. ')
         pass
 
     except Exception as e: 
-        raise Exception(f'Error encountered trying to remove {directory}: {e}') 
+        print(f'An unexpected error encountered trying to remove {directory}: {e}.\n Please report this error and your workflow / system specs to the Issues section of the MobCAl-MPI Github.') 
 
 class AppWindow(QtWidgets.QMainWindow):
     def __init__(self):
