@@ -9,13 +9,9 @@ def submit_file(File,options):
     ## file names
     basen = f'{File[:-4]}'
     basen_time = f'{File[:-4]}_{str(int(time.time()))}'
-    run_file = f'{basen_time}.run'
+    #run_file = f'{basen_time}.run'
     slurm_file = f'{submit_dir}/{basen_time}.slurm'
-    ## write .run file
-    opf = open(run_file,'w')
-    opf.write(f'{basen}.mfj' + '\n')
-    opf.write(f'{basen}.mout' + '\n')
-    opf.close()
+
     ## write .slurm file
     opf = open(slurm_file,'w')
     # SBATCH commands
@@ -36,7 +32,7 @@ def submit_file(File,options):
     opf.write('\n')
     opf.write('export I_MPI_PMI_LIBRARY=/usr/lib64/libpmi.so' + '\n')
     opf.write('\n')
-    opf.write(f'srun --mpi=pmi2 ./MobCal_MPI_202.exe {run_file}' + '\n')
+    opf.write(f'srun --mpi=pmi2 ./MobCal_MPI_203.exe {basen}.mfj {basen}.mout\n')
     ## close slurm file
     opf.close()
     ## submit
