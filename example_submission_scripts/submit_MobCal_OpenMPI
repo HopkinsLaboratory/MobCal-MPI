@@ -11,8 +11,12 @@ def submit_file(File,options):
     basen_time = f'{File[:-4]}_{str(int(time.time()))}'
     run_file = f'{basen_time}.run'
     slurm_file = f'{submit_dir}/{basen_time}.slurm'
-    
-	## write .slurm file
+    ## write .run file
+    opf = open(run_file,'w')
+    opf.write(f'{basen}.mfj' + '\n')
+    opf.write(f'{basen}.mout' + '\n')
+    opf.close()
+    ## write .slurm file
     opf = open(slurm_file,'w')
     # SBATCH commands
     opf.write('#!/bin/bash -l' + '\n')
@@ -30,7 +34,7 @@ def submit_file(File,options):
     opf.write('# JOB START (loading modules)' + '\n')
     opf.write('module load GCC/11.2.0 OpenMPI/4.1.1' + '\n')
     opf.write('\n')
-    opf.write(f'srun --cpu_bind=cores --distribution=block:cyclic ./MobCal_MPI_203.exe {basen}.mfj {basen}.mout\n')
+    opf.write(f'srun --cpu_bind=cores --distribution=block:cyclic ./MobCal_MPI_202.exe {run_file}' + '\n')
     ## close slurm file
     opf.close()
     ## submit
