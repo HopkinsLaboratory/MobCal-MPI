@@ -162,8 +162,8 @@ C****Start MPI Stuff
 c
 C***Read input file and output file name from command prompt
       if(imyrank.eq.0)then
-       call get_command_argument(1,filen1)
-	   call get_command_argument(2,filen2)
+       call getarg(1,filen1)
+       call getarg(2,filen2)
       endif
 c
 C************
