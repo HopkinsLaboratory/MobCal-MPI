@@ -73,13 +73,15 @@ def run(self, directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 		self.error_popup('critical','OpenBabel Error','Open Babel could not be found on your PC. Please install v2.4.1 as stated in the manual and ensure the babel.exe is available in your system\'s PATH')
 		return
 
-	#check for missing python files
-	required_python_files = os.path.join(os.getcwd(), 'mfj_creator', 'Python')
+	#check for missing python files using a safet __file__ call
+	req_files_dir = os.path.dirname(os.path.realpath(__file__))
+	
+	#required_python_files = os.path.join(os.getcwd(), 'mfj_creator', 'Python')
 	required_files = ['xyz_to_mfj.py', 'mass.prm', 'vdw.prm']
 	missing_files = []
 
 	for file in required_files:
-		file_path = os.path.join(required_python_files, file)
+		file_path = os.path.join(req_files_dir, file)
 		if not os.path.isfile(file_path): 
 			missing_files.append(file)
 
@@ -252,7 +254,8 @@ def run(self, directory, csv, sdf2xyz2sdf_Directory, charge, parameters):
 		xyz_file = os.path.join(babel_o[:-5], data[0][:-1] + '.xyz')
 		mfj_file = os.path.join(babel_o[:-5], data[0][:-1] + '.mfj')
 
-		xyz_to_mfj(self, os.getcwd() + '\\mfj_creator\\Python\\', xyz_file, key_file, mfj_file, charge, parameters)
+		#req_files_dir from above - gives location of Main.py, which contains the mass.prm and vdw.prm
+		xyz_to_mfj(self, req_files_dir, xyz_file, key_file, mfj_file, charge, parameters)
 
 		#After .mfj file is created, remove the .sdf file, .key file, and tinker xyz file as they are no longer useful. 
 		os.remove(os.path.join(babel_o[:-5], file))
