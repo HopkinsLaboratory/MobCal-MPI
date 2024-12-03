@@ -25,7 +25,7 @@ pip install numpy pyqt6 scipy matplotlib gitpython
 - Modified submission procedure. File names for input and output are now taken directly from command line arguments, not from an external file. Example:
 
     ```bash
-    ./MobCal_MPI_203.exe Acetaminophen.mfj Acetaminophen.mout
+    mpirun -n 8 MobCal_MPI_203.exe Acetaminophen.mfj Acetaminophen.mout
     ```
 
 ## Changes in v2.0.2

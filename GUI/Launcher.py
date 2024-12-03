@@ -447,7 +447,8 @@ class AppWindow(QtWidgets.QMainWindow):
     def check_for_update(self):
         
         # Get the current working directory and define the temporary directory path
-        root = os.getcwd()
+        root = os.path.dirname(os.path.realpath(__file__))
+        #root = os.getcwd()
 
         #URL of the MobCal-MPI repo
         repo_url = 'https://github.com/HopkinsLaboratory/MobCal-MPI'
@@ -471,10 +472,10 @@ class AppWindow(QtWidgets.QMainWindow):
 
         except FileNotFoundError:
             raise FileNotFoundError(f'{ID_file} could not be found. Please re-download from the MobCal-MPI GitHub repo and re-run the GUI launcher.')
-            
+
         # Remove the temporary directory if it exists and only if the local and repo SHAs match
         if repo_SHA == local_SHA: 
-            temp_dir = os.path.join(os.getcwd(), 'temp')
+            temp_dir = os.path.join(root, 'temp')
             if os.path.isdir(temp_dir):
                 delete_dir(temp_dir)
 
