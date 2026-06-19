@@ -1,0 +1,37 @@
+= what I learned =
+	- there are the gfortran and ifort compilers, whereas the latter is an Intel compiler
+	- mpifort can work with both (there is also mpiifort (yes, with 2xi), specifically for ifort from Intel)
+	- ifort is not open and thus only available in large HPC systems
+	- gfortran is open
+	
+	- gfortran cannot work with the optimization flags!
+	- -O1 up to -Ofast only work with ifort
+
+
+= Installation procedure =
+	- if you start from scratch, you need to install some essentials:
+	  $ sudo apt-get update
+	  $ sudo apt-get upgrade
+	  $ sudo apt-get install build-essential
+	  
+	- then you need to install OpenMPI
+	- I found this (https://docs.open-mpi.org/en/v5.0.x/installing-open-mpi/quickstart.html)
+	- but this was quite cumbersome so maybe there are quicker ways to do this
+	  (Tutorial from the ORCA developers: https://www.youtube.com/watch?v=61mDG1q7z44&t=102s)
+	- then, this seemed to have been important:
+	  $ sudo apt install libopenmpi-dev
+	- and to then actually have mpifort, run
+	  $ sudo apt install openmpi-bin
+	- now you should be able to check
+	  $ mpifort --version
+
+	- I used OpenMPI version 4.1.1 + mpifort w/ "GNU Fortran (GCC) 11.2.0"
+	- this compiles the code using
+      $ mpifort -o MobCal_MPI2.exe MobCal_MPI2.f -fallow-argument-mismatch
+	- no optimization flags possible and yes, there are warnings about rank mismatches, but the code does compiles
+	- the resulting .exe is some 4-5x slower than with the IntelMPI -Ofast stuff but the results are identical (on my end)
+	
+	- create a run.mob file with the in- and output files as 1st and 2nd line, respectively
+	- start the program via
+	  $ mpirun -np 4 ./MobCal_MPI2.exe run.mob
+	- (or write a script to do that for you)

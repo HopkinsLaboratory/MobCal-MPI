@@ -1,0 +1,13 @@
+just replaced the
+	include 'mpih.f'
+
+with
+	use mpi
+	
+
+(and also needs to be placed before the "implicit" statement)
+
+--> this removed the "MPI Rank missmatch" warnings
+--> thus, we don't need the "-fallow-argument-mismatch" anymore for compilation
+
+--> also works with -Og
