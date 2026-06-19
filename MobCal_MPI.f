@@ -119,9 +119,10 @@ c
       parameter(inpmax=201)
       dimension tmc(100),
      ?asympp(100)
-      character*50 filen1,filen2,unit,dchar,xlabel,infile
+      character*150 filen1,filen2,unit,dchar,xlabel,infile
       parameter (ixlen=1000)
       character*2 flend(32)
+      character*4 crank
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
       common/constants/mu,ro,eo,pi,cang,ro2,dipol,emax,m1,m2,
      ?xe,xeo,xk,xn,xmv,mconst,correct,romax,inatom,icoord,iic
@@ -188,7 +189,8 @@ C****Only node 0 opens output and input file
       if(imyrank.eq.0)then
        open(unit=8,file=filen2)
       else
-       open(unit=1000+imyrank,file='output'//flend(imyrank)//'.out',
+       write(crank,'(I4.4)') imyrank
+       open(unit=1000+imyrank,file='output'//crank//'.out',
      1  status='unknown')
       endif
       
@@ -581,7 +583,7 @@ c     Reads in coordinates and other parameters.
 c
       use mpi
       implicit double precision (a-h,m-z)
-      character*50 filen1,unit,dchar,xlabel
+      character*150 filen1,unit,dchar,xlabel
       parameter (ixlen=1000,inpmax=201)
       dimension imass(ixlen),xmass(ixlen) 
       common/printswitch/ip,it,iu1,iu2,iu3,iv,im2,im4,igs
@@ -1620,7 +1622,7 @@ c
      ?-0.55921513665d0/
       data var,cvar,acst/2.97013888888d0,0.990972222222d0,
      ?0.332866152768d0/
-      save hvar,hcvar
+      save hvar,hcvar,array,q
 c
       if(l.ge.0)then
 C      if (l) 4,1,3
@@ -2312,7 +2314,7 @@ c
       endif
 c
 C***********************************
-673   format(//1x,'f value for second order correction=',1pe11.4,/1x
+673   format(//1x,'f value for second order correction=',1pe11.4,/1x,
      1 '(see Hirschfelder, Curtis, Bird, 1954, p. 606)')
 674   format(//1x,'mean OMEGA*(1,1) =',1pe11.4,/1x,
      1 'standard deviation =',
@@ -2734,17 +2736,18 @@ c calcualte mobility
         EN=0.0d0
         vD=0.0d0
         mob_2nd=mob_1st
+        mob=mob_2nd
        else
         dens=xn/xmv
         mob_2nd=vD/(EN*dens)
+        mob=mob_2nd
+c empirical correction
+        empcorr=1.0d0+Aec*dexp(-Bec*1.d-21/EN)
+        mob=mob*empcorr
+        sig_mob=sig_mob2*empcorr
        endif
-       mob=mob_2nd
        sig_mob1=mob_1st/cs*sterr2
        sig_mob2=mob_2nd/cs*sterr2
-c empirical correction
-       empcorr=1.0d0+Aec*dexp(-Bec*1.d-21/EN)
-       mob=mob*empcorr
-       sig_mob=sig_mob2*empcorr
 c printout
        if(correct.gt.0)then
         write(8,671) EN*1.d21,vD,mob_1st,sig_mob1,mob_2nd,sig_mob2,
@@ -2784,16 +2787,16 @@ C      endif
 C***********************************
 C***********************************
 671   format(/1x,'red. field stregth E/N   =  ',f8.3,' Td'
-     1 /1x,     'drift velocity vD        =',f8.1,'   m/s'
-     1 /1x,     'red. mobility (1st ord.) =',e11.4,' +/-',e9.2,' m2/Vs'
-     1 /1x,     'red. mobility (2nd ord.) =',e11.4,' +/-',e9.2,' m2/Vs'
-     1 /1x,     'red. mobility (emp corr) =',e11.4,' +/-',e9.2,' m2/Vs'
-     1 /1x      'av. coll cross section   =',e11.4,' +/-',e9.2,' A**2')
+     1 /1x,    'drift velocity vD        =',f8.1,'   m/s'
+     1 /1x,    'red. mobility (1st ord.) =',e11.4,' +/-',e9.2,' m2/Vs'
+     1 /1x,    'red. mobility (2nd ord.) =',e11.4,' +/-',e9.2,' m2/Vs'
+     1 /1x,    'red. mobility (emp corr) =',e11.4,' +/-',e9.2,' m2/Vs'
+     1 /1x,     'av. coll cross section   =',e11.4,' +/-',e9.2,' A**2')
 672   format(/1x,'red. field stregth E/N   =  ',f8.3,' Td'
-     1 /1x,     'drift velocity vD        =',f8.1,'   m/s'
-     1 /1x,     'red. mobility (1st ord.) =',e11.4,' +/-',e9.2,' m2/Vs'
-     1 /1x,     'red. mobility (2nd ord.) =',e11.4,' +/-',e9.2,' m2/Vs'
-     1 /1x      'av. coll cross section   =',e11.4,' +/-',e9.2,' A**2')
+     1 /1x,    'drift velocity vD        =',f8.1,'   m/s'
+     1 /1x,    'red. mobility (1st ord.) =',e11.4,' +/-',e9.2,' m2/Vs'
+     1 /1x,    'red. mobility (2nd ord.) =',e11.4,' +/-',e9.2,' m2/Vs'
+     1 /1x,     'av. coll cross section   =',e11.4,' +/-',e9.2,' A**2')
 677   format(1x,'OM*(l,s)',5x,'s=1',9x,'s=2',9x,'s=3',9x,'s=4',
      1 /1x,'   l=1  ',1x,1pe11.4,1x,1pe11.4,1x,1pe11.4,1x,1pe11.4,
      1 /1x,'   l=2  ',12x       ,1x,1pe11.4,1x,1pe11.4,1x,1pe11.4,
