@@ -1411,13 +1411,13 @@ c
       e0=0.5d0*mu*v*v
       x=b
       z=0.d0     
-c
+c Determine the dimensions of the ion 
       ymin=0.d0
       ymax=0.d0
-C      do 200 i=1,inatom
-C       if(fy(i).gt.ymax) ymax=fy(i)
-C       if(fy(i).lt.ymin) ymin=fy(i)
-C200   continue
+      do 200 i=1,inatom
+       if(fy(i).gt.ymax) ymax=fy(i)
+       if(fy(i).lt.ymin) ymin=fy(i)
+200   continue
       ymax=ymax/1.0d-10
       ymin=ymin/1.0d-10
       iymin=nint(ymin)-1
@@ -1470,6 +1470,7 @@ C        if(it.eq.1) write(8,621)
          ang=0.d0
          erat=1.000d0
          ireturn=1
+		 exit
         endif
        enddo
 C****
